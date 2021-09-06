@@ -1,6 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_bootstrap import Bootstrap
-import selenium
 from web_bots import *
 # from flask_ckeditor import CKEditor
 # from datetime import date
@@ -14,4 +13,11 @@ from web_bots import *
 # from flask_gravatar import Gravatar
 # from datetime import datetime
 # import os
+
+
+app = Flask(__name__)
+
+
 kucklehead_scraper = KnuckleHeadScraper()
+kucklehead_scraper.get_shows()
+
