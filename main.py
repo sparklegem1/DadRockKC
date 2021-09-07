@@ -15,9 +15,26 @@ from web_bots import *
 # import os
 
 
+
+
+############################### API DESCRIPTION ###################################
+# Get all information about local shows from one site with the local gig api
+# Employing web scraping to get show information from local sites to provide
+# up to date info on local shows
+
+
+
 app = Flask(__name__)
 
 
-kucklehead_scraper = KnuckleHeadScraper()
-kucklehead_scraper.get_shows()
 
+
+
+##### KnuckleHeads Scraper ####
+# kucklehead_scraper = KnuckleHeadScraper()
+# kucklehead_scraper.get_shows()
+# kucklehead_scraper.find_price(kucklehead_scraper.show_info[0])
+
+####### Record Bar Scraper #######
+recordbar_scraper = RecordBarScraper()
+recordbar_scraper.get_shows()

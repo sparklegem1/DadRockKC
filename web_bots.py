@@ -2,14 +2,15 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
+import time
 
 
 
-############################### API DESCRIPTION ###################################
-# Get all information about local shows from one site with the local gig api
-# Employing web scraping to get show information from local sites to provide
-# up to date info on local shows
 
+
+show_info = {'knuckleheads': [],
+             'recordbar': []
+             }
 
 
 
@@ -18,10 +19,42 @@ class KnuckleHeadScraper:
 
     def __init__(self):
         self.driver = webdriver.Chrome(ChromeDriverManager().install())
+        self.show_info = show_info['knuckleheads']
+
+
+    def find_price(self, show):
+        # where show is the object in shows
+        self.driver.get('https://knuckleheadskc.com/')
+        time.sleep(5)
+
+        upcoming_shows = self.driver.find_element_by_xpath('//*[@id="navTopLevel"]/li[2]/a')
+        upcoming_shows.click()
+        time.sleep(5)
+
+        all_shows = self.driver.find_elements_by_class_name('pl-item')
+        for element in all_shows[:11]:
+            print(element.find_element_by_class_name('pl-event-link').text)
+            print(show['title'])
+            if show['price'] != 'Not Free':
+                print('this event is free')
+                return {'msg': 'this event is free'}
+            if element.find_element_by_class_name('pl-event-link').text == show['title']:
+                try:
+                    price_button = element.find_element_by_class_name('buy-tickets')
+                    price_button.click()
+                    time.sleep(2)
+                    self.driver.get(self.driver.current_url)
+                    price = self.driver.find_element_by_class_name('price-cell').text
+                    print(price)
+                    return {'price': price}
+                except NoSuchElementException:
+                    print('no price available or third-party ticketing')
+                    return {'msg': 'this event likely is priced through third party ticketing'}
+
 
     def get_shows(self):
         import time
-        show_info = []
+
 
         self.driver.get('https://knuckleheadskc.com/')
         time.sleep(5)
@@ -48,9 +81,6 @@ class KnuckleHeadScraper:
             except NoSuchElementException:
                 # import time
                 price = element.find_element_by_class_name('buy-tickets').text
-                # ticket_button.click()
-                # time.sleep(2)
-                # price = element.find_element_by_class_name('price-cell').text
 
 
             individual_show['title'] = title
@@ -59,8 +89,32 @@ class KnuckleHeadScraper:
             if price == 'BUY TICKETS':
                 price = 'Not Free'
             individual_show['price'] = price
-            show_info.append(individual_show)
+            show_info['knuckleheads'].append(individual_show)
         print(show_info)
+
+
+
+class RecordBarScraper:
+
+    def __init__(self):
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())
+        self.show_info = show_info['recordbar']
+
+    def get_shows(self):
+        self.driver.get('https://www.therecordbar.com/tickets')
+        all_shows = self.driver.find_elements_by_class_name('w-tick-item flex')
+        for show in all_shows[:11]:
+            print(show)
+            individual_show = {}
+            price = show.find_element_by_class_name('w-price').text
+            title = show.find_element('h2').text
+            individual_show['price'] = price
+            individual_show['title'] = title
+            print(individual_show)
+
+
+
+
 
 
 
