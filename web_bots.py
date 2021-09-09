@@ -1,6 +1,8 @@
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
+from bs4 import BeautifulSoup
+import requests
 from selenium.common.exceptions import NoSuchElementException
 import time
 
@@ -94,23 +96,65 @@ class KnuckleHeadScraper:
 
 
 
-class RecordBarScraper:
+class RiotRoomScraper:
+
+    response = requests.get('https://theriotroom.com/')
+    soup = BeautifulSoup(response.text, 'html.parser')
 
     def __init__(self):
         self.driver = webdriver.Chrome(ChromeDriverManager().install())
         self.show_info = show_info['recordbar']
 
+    #####Selenium######
     def get_shows(self):
-        self.driver.get('https://www.therecordbar.com/tickets')
-        all_shows = self.driver.find_elements_by_class_name('w-tick-item flex')
+
+        self.driver.get('https://theriotroom.com/')
+        time.sleep(2)
+
+        all_shows = self.driver.find_elements_by_class_name('type-tribe_events')
+
+        dates_and_times = {'dates': [], 'times': []}
         for show in all_shows[:11]:
-            print(show)
-            individual_show = {}
-            price = show.find_element_by_class_name('w-price').text
-            title = show.find_element('h2').text
-            individual_show['price'] = price
-            individual_show['title'] = title
-            print(individual_show)
+            date_and_time = {'date': '', 'time': ''}
+            text = show.find_element_by_tag_name('span')
+            print(text)
+
+
+
+
+
+
+        # all_shows = self.driver.find_elements_by_css_selector('')
+        #
+        #
+        #
+        #
+        # print(all_shows)
+        # for show in all_shows[:11]:
+        #     print(show)
+        #     individual_show = {}
+        #     price = show.find_element_by_class_name('w-price').text
+        #     title = show.find_element('h2').text
+        #     individual_show['price'] = price
+        #     individual_show['title'] = title
+        #     print(individual_show)
+
+
+    ##### Beautiful Soup #######
+    # def get_shows(self):
+    #     response = requests.get('https://www.therecordbar.com/tickets')
+    #     html = response.content
+    #     soup = BeautifulSoup(html, 'html.parser')
+    #     with open("output.html", "w", encoding = 'utf-8') as file:
+    #
+    # # prettify the soup object and convert it into a string
+    #         file.write(str(soup.prettify()))
+    #
+    #     print(html)
+    #     # with open('record_bar_site.html', 'w') as site:
+    #     #     site.write(html)
+
+
 
 
 
