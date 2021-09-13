@@ -11,7 +11,7 @@ import time
 
 
 show_info = {'knuckleheads': [],
-             'recordbar': []
+             'riotroom': []
              }
 
 
@@ -103,7 +103,7 @@ class RiotRoomScraper:
 
     def __init__(self):
         self.driver = webdriver.Chrome(ChromeDriverManager().install())
-        self.show_info = show_info['recordbar']
+        self.show_info = show_info['riotroom']
 
     #####Selenium######
     def get_shows(self):
@@ -113,13 +113,30 @@ class RiotRoomScraper:
 
         all_shows = self.driver.find_elements_by_class_name('type-tribe_events')
 
-        dates_and_times = {'dates': [], 'times': []}
         for show in all_shows[:11]:
-            date_and_time = {'date': '', 'time': ''}
-            text = show.find_element_by_tag_name('span')
-            print(text)
-
-
+            date_and_time = {'date': '', 'title': '', 'price': ''}
+            date = show.find_element_by_class_name('singleEventDate').text
+            event_time = show.find_element_by_tag_name('span').text.strip('Show| //Doors | ')[:6]
+            title = show.find_element_by_tag_name('h2').text
+            try:
+                cost = show.find_element_by_class_name('eventCost').text
+            except NoSuchElementException:
+                cost = 'free'
+            date_and_time['date'] = date
+            if event_time[:2] != 'Sh':
+                date_and_time['time'] = event_time
+            else:
+                date_and_time['time'] = 'No time available'
+            date_and_time['title'] = title
+            date_and_time['price'] = cost
+            self.show_info.append(date_and_time)
+            print('------------------------------------')
+            print(date)
+            print(event_time)
+            print(title)
+            print(cost)
+            print(date_and_time)
+            print('------------------------------------')
 
 
 

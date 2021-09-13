@@ -4,12 +4,48 @@ body {
 
 }
 
+#title {
+    color: #FCFF91;
+    font-family: 'Urbanist', sans-serif;
+    font-weight: 700;
+    font-size: 45px;
+    margin: 10vh;
+
+}
+
 #top-shelf {
     color: #8FD1A2;
     font-size: 35px;
-    position: absolute;
     margin: 10vh;
     width: 50%;
     font-family: 'Urbanist', sans-serif;
+}
 
+#documentaion {
+    color: #000000;
+    background: #F3F3F3;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 10px;
+
+}
+
+.title {
+    margin: 10vh;
+    padding: 20px;
+    font-size: 27px;
+    font-family: 'Urbanist', sans-serif;
+}
+
+.left-table {
+    position: absolute;
+    margin-bottom: 250px;
+    margin-left: 55%;
+}
+
+@for $i from 1 through 100 {
+  .percentage-#{$i}:after {
+    $value: ($i * 1%);
+    width: $value;
+  }
 }
