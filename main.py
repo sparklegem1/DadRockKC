@@ -2,6 +2,8 @@ from flask import Flask, render_template, redirect, url_for, flash, request, jso
 from flask_bootstrap import Bootstrap
 from sqlalchemy import column
 from sqlalchemy.orm import relationship
+from werkzeug.security import generate_password_hash
+
 from web_bots import *
 from flask_sqlalchemy import SQLAlchemy
 # from flask_ckeditor import CKEditor
@@ -32,10 +34,31 @@ app = Flask(__name__)
 #db
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dadrockkc.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'huffingpaint60'
 db = SQLAlchemy(app)
-login_manager = LoginManager()
-login_manager.init_app(app)
+# login_manager = LoginManager()
+# login_manager.init_app(app)
 
+
+# database for all venues
+
+class User(UserMixin, db.Model):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(1000))
+    email = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(100))
+
+    #Relationships
+    show_reviews = relationship('ShowReview', back_populates='user')
+    venue_reviews = relationship('VenueReview', back_populates='user')
+    show_comments = relationship('ShowComment', back_populates='comment_author')
+    venue_comments = relationship('VenueComment', back_populates='comment_author')
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
+db.create_all()
 
 # database for all venues
 class Venue(db.Model):
@@ -44,7 +67,11 @@ class Venue(db.Model):
     venue_name = db.Column(db.String(20), nullable=False)
 
     #reviews relationship
-    reviews = relationship('VenueReview', back_populates='parent_post')
+    venue_reviews = relationship('VenueReview', back_populates='parent_post')
+    show_reviews = relationship('ShowReview', back_populates='venue')
+    #
+db.create_all()
+
 
 
 # A database for reviews of Shows
@@ -63,26 +90,32 @@ class ShowReview(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = relationship('User', back_populates='show_reviews')
 
+    # venue relationship
+    venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'))
+    venue = relationship('Venue', back_populates='show_reviews')
+
     # Children
     comments = relationship('ShowComment', back_populates='show_parent')
 
     def to_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
+db.create_all()
+
 class VenueReview(db.Model):
     __tablename__ = 'venue_review'
     id = db.Column(db.Integer, primary_key=True)
+    review_title = db.Column(db.String(20), nullable=False)
     venue_name = db.Column(db.String(20), nullable=False)
     review = db.Column(db.String(2000), nullable=False)
-
-
 
     #User relationship
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = relationship('User', back_populates='venue_reviews')
 
     #venue relationship
-    parent_post = relationship('Venue', back_populates='reviews')
+    venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'))
+    parent_post = relationship('Venue', back_populates='venue_reviews')
 
     # Children
     comments = relationship('VenueComment', back_populates='venue_parent')
@@ -90,39 +123,7 @@ class VenueReview(db.Model):
     def to_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
-
-
-class User(UserMixin, db.Model):
-    __tablename__ = 'user'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(1000))
-    email = db.Column(db.String(100), unique=True)
-    password = db.Column(db.String(100))
-
-    #Relationships
-    show_reviews = relationship('ShowReview', back_populates='user')
-    venue_reviews = relationship('VenueReview', back_populates='user')
-    show_comments = relationship('ShowComment', back_populates='comment_author')
-    venue_comments = relationship('VenueComment')
-
-    def to_dict(self):
-        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
-
-
-
-class ShowComment(db.Model):
-    __tablename__ = 'show_comment'
-    id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.String(250))
-
-    #user relationship
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    comment_author = relationship('User', back_populates='comments')
-
-    # Parent
-    show_id = db.Column(db.Integer, db.ForeignKey('show_review.id'))
-    show_parent = relationship('ShowReview', back_populates='comments')
-    parent_post = relationship('', back_populates='comments')
+db.create_all()
 
 class VenueComment(db.Model):
     __tablename__ = 'venue_comment'
@@ -136,6 +137,33 @@ class VenueComment(db.Model):
     # Parent
     venue_id = db.Column(db.Integer, db.ForeignKey('venue_review.id'))
     venue_parent = relationship('VenueReview', back_populates='comments')
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
+
+db.create_all()
+
+class ShowComment(db.Model):
+    __tablename__ = 'show_comment'
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(250))
+
+    #user relationship
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    comment_author = relationship('User', back_populates='show_comments')
+
+    # Parent
+    show_id = db.Column(db.Integer, db.ForeignKey('show_review.id'))
+    show_parent = relationship('ShowReview', back_populates='comments')
+
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+db.create_all()
+
+
+####################################### REST API #########################################
 
 @app.route('/')
 def home():
@@ -158,10 +186,34 @@ def riotroom_data():
     return jsonify(riotroom_schedule=riotroom_scraper.show_info)
 
 
-@app.route('/edit-event')
-def edit_event():
-    pass
+@app.route('/create-account', methods=['GET', 'POST'])
+def create_user_account():
+    username = input('username: ')
+    password = input('password: ')
+    email = input('email: ')
 
+
+    form = {'username': username, 'password': password, 'email': email}
+
+    if form:
+        # HAD TO PUT .first() TO GET IT TO WORK, OTHERWISE ALL EMAILS WOULD TRIGGER THIS IF STATEMENT
+        if User.query.filter_by(email=form['email']).first() or User.query.filter_by(username=form['username']).first():
+            flash('there is already an account associated with this email')
+            print(User.query.filter_by(email=form.email.data))
+            return redirect(url_for('register'))
+        to_hash = form['password']
+        hash = generate_password_hash(to_hash, method='pbkdf2:sha256', salt_length=8)
+        new_user = User(
+            username=form['username'],
+            email=form['email'],
+            password=hash
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({'message': 'Success',
+                        'username': new_user['username'],
+                        'email': new_user['email']})
+    return jsonify({'message': 'create-account'})
 
 if __name__ == '__main__':
     app.run(debug=True)
