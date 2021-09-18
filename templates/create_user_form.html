@@ -1,0 +1,12 @@
+{% include "site.html" %}
+
+<form action="{{ url_for('create_account_html') }}" method="post">
+    <label>Username</label>
+    <input type="text" placeholder="name" name="username">
+    <label>Password</label>
+    <input type="text" placeholder="password" name="password">
+    <label>Email</label>
+    <input type="text" placeholder="email" name="email">
+</form>
+<button>Ok</button>
+

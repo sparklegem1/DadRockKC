@@ -185,22 +185,19 @@ def riotroom_data():
     riotroom_scraper.get_shows()
     return jsonify(riotroom_schedule=riotroom_scraper.show_info)
 
+@app.route('/message/<json>')
+def return_json(json):
+    json_file = jsonify(json)
+    return json_file
 
-@app.route('/create-account', methods=['GET', 'POST'])
-def create_user_account():
-    username = input('username: ')
-    password = input('password: ')
-    email = input('email: ')
-
-
+@app.route('/create-account/<username>/<password>/<email>', methods=['GET', 'POST'])
+def create_user_account(username, password, email):
     form = {'username': username, 'password': password, 'email': email}
 
     if form:
         # HAD TO PUT .first() TO GET IT TO WORK, OTHERWISE ALL EMAILS WOULD TRIGGER THIS IF STATEMENT
         if User.query.filter_by(email=form['email']).first() or User.query.filter_by(username=form['username']).first():
-            flash('there is already an account associated with this email')
-            print(User.query.filter_by(email=form.email.data))
-            return redirect(url_for('register'))
+            return redirect(url_for('return_json', json={'messsage': 'there is already an account associated with this email or username'}))
         to_hash = form['password']
         hash = generate_password_hash(to_hash, method='pbkdf2:sha256', salt_length=8)
         new_user = User(
@@ -210,10 +207,61 @@ def create_user_account():
         )
         db.session.add(new_user)
         db.session.commit()
-        return jsonify({'message': 'Success',
-                        'username': new_user['username'],
-                        'email': new_user['email']})
+        return redirect(
+            url_for('return_json',
+                json={'message': f'Welcome {form["username"]}! Tis a pleasure to have you aboard! You may now post reviews and comments. ',
+                'username': form['username'],
+                'email': form['email']})
+        )
     return jsonify({'message': 'create-account'})
+
+@app.route('/create-account-page', methods=['GET', 'POST'])
+def create_account_html():
+    if request.method == 'POST':
+        if User.query.filter_by(email=request.form['email']).first() or User.query.filter_by(username=request.form['username']).first():
+            return redirect(url_for('return_json', json={'messsage': 'there is already an account associated with this email or username'}))
+        username = request.form['Username']
+        password = request.form['Password']
+        email = request.form['Email']
+        to_hash = password
+        hash = generate_password_hash(to_hash, method='pbkdf2:sha256', salt_length=8)
+        new_user = User(
+            username=username,
+            email=email,
+            password=hash
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('home'))
+
+    return render_template('create_user_form.html')
+
+@app.route('/post-venue-review', methods=['GET', 'POST'])
+def post_venue_review():
+    if request.method == 'POST':
+        if Venue.query.filter_by(venue_name=request.form['venue-name']).first():
+            new_review = VenueReview(
+                review_title = request.form['review-title'],
+                venue_name = request.form['venue-name'],
+                review = request.form['review'],
+                user_id=1,
+                venue_id=1
+            )
+            db.session.add(new_review)
+            db.session.commit()
+            return redirect(url_for('home'))
+        else:
+            message = True
+            return redirect(url_for('post_venue_review', message=message))
+
+    return render_template('venue-review.html')
+
+"""
+
+Worked on  9/16/21: template for forms, css for forms
+TODO: template for creating reviews and comments and editing comments
+
+"""
 
 if __name__ == '__main__':
     app.run(debug=True)

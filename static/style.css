@@ -37,15 +37,43 @@ body {
     font-family: 'Urbanist', sans-serif;
 }
 
+label {
+    font-weight: 700;
+    padding: 10px;
+    margin: 10px 20px;
+}
+
 .left-table {
     position: absolute;
     margin-bottom: 250px;
     margin-left: 55%;
 }
 
-@for $i from 1 through 100 {
-  .percentage-#{$i}:after {
-    $value: ($i * 1%);
-    width: $value;
-  }
+input[type=text], textarea {
+width: 25%;
+padding: 12px 20px;
+margin: 8px 10px;
+display: list-item;
+border-radius: 8px;
+
 }
+
+button {
+  background-color: #04AA6D;
+  font-size: 25px;
+  color: white;
+  padding: 14px 20px;
+  margin-top: 20px;
+  margin-left: 10px;
+  border: none;
+  cursor: pointer;
+  width: 15%;
+}
+
+
+
+button:hover {
+  opacity: 0.9;
+}
+
+
