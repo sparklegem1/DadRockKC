@@ -1,5 +1,5 @@
 {% include "site.html" %}
-
+<div class="title">
 <form action="{{ url_for('create_account_html') }}" method="post">
     <label>Username</label>
     <input type="text" placeholder="name" name="username">
@@ -9,4 +9,4 @@
     <input type="text" placeholder="email" name="email">
 </form>
 <button>Ok</button>
-
+</div>

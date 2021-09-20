@@ -3,7 +3,6 @@ from flask_bootstrap import Bootstrap
 from sqlalchemy import column
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash
-
 from web_bots import *
 from flask_sqlalchemy import SQLAlchemy
 # from flask_ckeditor import CKEditor
@@ -32,7 +31,7 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 app = Flask(__name__)
 
 #db
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dadrockkc.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dadrockkc2.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'huffingpaint60'
 db = SQLAlchemy(app)
@@ -65,6 +64,7 @@ class Venue(db.Model):
     __tablename__ = 'venue'
     id = db.Column(db.Integer, primary_key=True)
     venue_name = db.Column(db.String(20), nullable=False)
+    city = db.Column(db.String(20), nullable=False)
 
     #reviews relationship
     venue_reviews = relationship('VenueReview', back_populates='parent_post')
@@ -185,13 +185,13 @@ def riotroom_data():
     riotroom_scraper.get_shows()
     return jsonify(riotroom_schedule=riotroom_scraper.show_info)
 
-@app.route('/message/<json>')
+@app.route('/json/<json>')
 def return_json(json):
-    json_file = jsonify(json)
-    return json_file
+    return jsonify(json)
 
 @app.route('/create-account/<username>/<password>/<email>', methods=['GET', 'POST'])
 def create_user_account(username, password, email):
+    ###### This endpoint is for API client use, html version below #################
     form = {'username': username, 'password': password, 'email': email}
 
     if form:
@@ -217,6 +217,7 @@ def create_user_account(username, password, email):
 
 @app.route('/create-account-page', methods=['GET', 'POST'])
 def create_account_html():
+    ########## This is the html version ###################
     if request.method == 'POST':
         if User.query.filter_by(email=request.form['email']).first() or User.query.filter_by(username=request.form['username']).first():
             return redirect(url_for('return_json', json={'messsage': 'there is already an account associated with this email or username'}))
@@ -232,27 +233,45 @@ def create_account_html():
         )
         db.session.add(new_user)
         db.session.commit()
-        return redirect(url_for('home'))
+        message = {'username': new_user['username'], 'email': new_user['email']}
+        return redirect(url_for('return_json', json=message))
 
     return render_template('create_user_form.html')
+
+@app.route('/add-venue', methods=['GET', 'POST'])
+def add_venue():
+    if request.method == 'POST':
+        if not Venue.query.filter_by(venue_name=request.form['venue-name']).first():
+            new_venue = Venue(
+                venue_name=request.form['venue-name'],
+                city=request.form['city']
+            )
+            db.session.add(new_venue)
+            db.session.commit()
+            data = {'venue-name': request.form['venue-name'], 'city': request.form['city']}
+            return redirect(url_for('return_json', json=data))
+    return render_template('add-venue.html')
 
 @app.route('/post-venue-review', methods=['GET', 'POST'])
 def post_venue_review():
     if request.method == 'POST':
         if Venue.query.filter_by(venue_name=request.form['venue-name']).first():
             new_review = VenueReview(
-                review_title = request.form['review-title'],
-                venue_name = request.form['venue-name'],
-                review = request.form['review'],
+                review_title=request.form['review-title'],
+                venue_name=request.form['venue-name'],
+                review=request.form['review'],
                 user_id=1,
-                venue_id=1
+                venue_id=Venue.query.filter_by(venue_name=request.form['venue-name']).first().id
             )
             db.session.add(new_review)
             db.session.commit()
-            return redirect(url_for('home'))
+            message = {'review-title': request.form['review-title'],
+                       'venue-name': request.form['venue-name'],
+                       'review': request.form['review']}
+            return redirect(url_for('return_json', json=message))
         else:
-            message = True
-            return redirect(url_for('post_venue_review', message=message))
+            message = {'Message': 'this venue is not in the database, you should add it! ;)'}
+            return jsonify(message)
 
     return render_template('venue-review.html')
 

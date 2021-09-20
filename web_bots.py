@@ -75,7 +75,11 @@ class KnuckleHeadScraper:
             date = f"{element.find_element_by_class_name('pl-weekday').text}/" \
                    f"{element.find_element_by_class_name('pl-monthday').text}/" \
                    f"{element.find_element_by_class_name('pl-month').text}"
-            time = element.find_element_by_class_name('show-end-time-0').text
+            try:
+                time = element.find_element_by_class_name('show-end-time-0').text
+
+            except NoSuchElementException:
+                time = 'no time available'
 
             try:
                 price = element.find_element_by_class_name('pl-sale-status').text
@@ -115,14 +119,19 @@ class RiotRoomScraper:
 
         for show in all_shows[:11]:
             date_and_time = {'date': '', 'title': '', 'price': ''}
-            date = show.find_element_by_class_name('singleEventDate').text
+            try:
+                date = show.find_element_by_class_name('singleEventDate').text
+            except NoSuchElementException:
+                date = 'no date available'
             event_time = show.find_element_by_tag_name('span').text.strip('Show| //Doors | ')[:6]
             title = show.find_element_by_tag_name('h2').text
             try:
                 cost = show.find_element_by_class_name('eventCost').text
             except NoSuchElementException:
                 cost = 'free'
+
             date_and_time['date'] = date
+
             if event_time[:2] != 'Sh':
                 date_and_time['time'] = event_time
             else:

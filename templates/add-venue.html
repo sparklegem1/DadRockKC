@@ -1,0 +1,11 @@
+{% include "site.html" %}
+
+<div class="title">
+    <form action="{{ url_for('add_venue') }}" method="post">
+        <label>Venue Name</label>
+        <input type="text" placeholder="venue-name" name="venue-name">
+        <label>City</label>
+        <input type="text" placeholder="city" name="city">
+        <button type="submit">🦄</button>
+    </form>
+</div>
