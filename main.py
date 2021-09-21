@@ -275,6 +275,20 @@ def post_venue_review():
 
     return render_template('venue-review.html')
 
+@app.route('/add-show-review', methods=['GET', 'POST'])
+def show_review():
+    venues = Venue.query.all()
+    venue_names = []
+    unicorns = ["🦄", "🦄", "🦄", "🦄", "🦄"]
+    for venue in venues:
+        venue_names.append(venue.venue_name)
+    if request.method == 'POST':
+        review = request.form['review']
+        return jsonify({'review': review})
+    return render_template('add-show-review.html', venue_names=venue_names, unicorns=unicorns)
+
+
+
 """
 
 Worked on  9/16/21: template for forms, css for forms

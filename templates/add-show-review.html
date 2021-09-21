@@ -1,0 +1,27 @@
+{% include "site.html" %}
+
+<div class="title">
+    <form action="{{ url_for('show_review') }}" method="post">
+        <label>Select Venue</label>
+        <select name="venue" method="GET" action="/">
+            {% for name in venue_names: %}
+                <option value="{{name}}" SELECTED>{{name}}</option>"
+            {% endfor %}
+        </select>
+        <label>Rating</label>
+        <select name="rating" method="GET" action="/">
+            {% for n in range(1, 6): %}
+
+                <option value="{{''.join(unicorns[:n])}}" SELECTED>{{''.join(unicorns[:n])}}</option>"
+
+            {% endfor %}
+        </select>
+        <label>Show Date</label>
+        <input type="text" placeholder="approximate date" name="date">
+        <label>Price (Best guess)</label>
+        <input type="text" placeholder="try and remember the price or just put something" name="price">
+        <label>Review</label>
+        <textarea id="venue-review" type="text" placeholder="give us the deets! we wanna know the juice" style="height:200px" name="review"></textarea>
+        <button type="submit">🦄</button>
+    </form>
+</div>

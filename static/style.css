@@ -40,7 +40,7 @@ body {
 label {
     font-weight: 700;
     padding: 10px;
-    margin: 10px 20px;
+    margin-bottom: 10px;
 }
 
 .left-table {
@@ -72,7 +72,15 @@ button {
   width: 15%;
 }
 
-
+select {
+    width: 25%;
+    padding: 12px 20px;
+    margin: 8px 10px;
+    display: list-item;
+    border-radius: 8px;
+    font-family: 'Urbanist', sans-serif;
+    font-weight: 600;
+}
 
 button:hover {
   opacity: 0.9;
