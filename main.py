@@ -12,7 +12,7 @@ from flask_sqlalchemy import SQLAlchemy
 # from werkzeug.security import generate_password_hash, check_password_hash
 # from sqlalchemy.orm import relationship
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
-# from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
+from forms import CommentForm
 # from flask_gravatar import Gravatar
 # from datetime import datetime
 # import os
@@ -31,7 +31,7 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 app = Flask(__name__)
 
 #db
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dadrockkc2.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dadrockkc3.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'huffingpaint60'
 db = SQLAlchemy(app)
@@ -79,10 +79,11 @@ class ShowReview(db.Model):
     __tablename__ = 'show_review'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(250), nullable=False)
+    artist_names = db.Column(db.String(100), nullable=True)
+    venue = db.Column(db.String(20), nullable=False)
     date = db.Column(db.String(250), nullable=False)
     genre = db.Column(db.String(15), nullable=False)
     price = db.Column(db.Float(20), nullable=False)
-    time = db.Column(db.String(10), nullable=True)
     rating = db.Column(db.String(10), nullable=False)
     review = db.Column(db.String(2000), nullable=False)
 
@@ -160,9 +161,22 @@ class ShowComment(db.Model):
 
     def to_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
 db.create_all()
 
-
+# show = ShowReview(
+#     title='yayy',
+#     artist_names='oops',
+#     venue=Venue.query.filter_by(venue_name='Riot Room').first(),
+#     date='yesterday',
+#     genre='blokes',
+#     price='20',
+#     rating='🦄',
+#     review='suckes',
+#     user_id=1
+# )
+# db.session.add(show)
+# db.session.commit()
 ####################################### REST API #########################################
 
 @app.route('/')
@@ -283,16 +297,68 @@ def show_review():
     for venue in venues:
         venue_names.append(venue.venue_name)
     if request.method == 'POST':
+        title = request.form['title']
+        artist_names = request.form['artists']
+        venue_name = request.form['venue']
+        date = request.form['date']
+        price = request.form['price']
+        rating = request.form['rating']
         review = request.form['review']
-        return jsonify({'review': review})
+        show_review = ShowReview(
+            title=title,
+            artist_names=artist_names,
+            venue=venue_name,
+            date=date,
+            rating=rating,
+            review=review,
+            price=price,
+            user_id=1,
+            venue_id=Venue.query.filter_by(venue_name=venue_name).first().id
+        )
+        db.session.add(show_review)
+        db.session.commit()
+        return jsonify({'title': title, 'review': review})
     return render_template('add-show-review.html', venue_names=venue_names, unicorns=unicorns)
+
+
+
+@app.route("/post/<int:post_id>", methods=['GET', 'POST'])
+def view_show_review(post_id):
+    requested_review = ShowReview.query.get(post_id)
+    comment = CommentForm()
+    all_comments = requested_review.comments
+    if request.method == 'POST':
+        if not current_user.is_authenticated:
+            flash('You must first login to comment')
+            return redirect(url_for('login'))
+
+        comment_form_data = comment.comments.data
+        new_comment = ShowComment(
+            text=comment_form_data,
+            comment_author=current_user,
+            parent_post=requested_review
+        )
+        db.session.add(new_comment)
+        db.session.commit()
+
+
+
+    return render_template("post.html", post=requested_post, form=comment, comments=all_comments, current_user=current_user, year=datetime.now().year)
+
+@app.route('/show-comment')
+def show_comment():
+    return jsonify({})
 
 
 
 """
 
 Worked on  9/16/21: template for forms, css for forms
-TODO: template for creating reviews and comments and editing comments
+//TODO: template for creating show review
+TODO: add show review to database
+//TODO: update database to include a title for the show review class.
+
+
 
 """
 
