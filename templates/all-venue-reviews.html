@@ -1,0 +1,46 @@
+{% include "site.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+<div class="title">
+{% for post in reviews: %}
+    <div class="container">
+
+        <div class="post-heading">
+                <h1>"{{post.review_title}}"</h1>
+                {% if post.user != None: %}
+                <p>-{{ post.user.username }}</p>
+                {% else: %}
+                <p>-Spongebob</p>
+                {% endif %}
+                <h2 class="subheading">Venue </h2>
+                <p>{{post.venue_name}}</p>
+                <h2>Review</h2>
+                <p>{{post.review}}</p>
+            </div>
+
+
+    </div>
+
+    <div class="comment-section">
+        <h2 class="comment-title">Comments</h2>
+        <ul class="commentList">
+            {% for comment in post.comments: %}
+            <li>
+                <div class="commenterImage">
+
+                </div>
+                <div class="commentText">
+                    <p>{{ comment.text|safe }}</p>
+                </div>
+                <div class="avatar-image">
+                    <span>{{ comment.comment_author.username }}</span>
+                    <img src="{{ url_for('static', filename='img/scoob.jpeg')}}"/>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+
+    </div>
+{% endfor %}
+</div>

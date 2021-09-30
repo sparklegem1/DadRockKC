@@ -5,5 +5,5 @@ from wtforms.validators import DataRequired
 
 
 class CommentForm(FlaskForm):
-    comments = CKEditorField("Comments", validators=[DataRequired()])
+    comments = CKEditorField("Comment", validators=[DataRequired()])
     submit = SubmitField('Share Comment')
