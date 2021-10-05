@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for, flash, request, jso
 from flask_bootstrap import Bootstrap
 from sqlalchemy import column
 from sqlalchemy.orm import relationship
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from web_bots import *
 from flask_sqlalchemy import SQLAlchemy
 from flask_ckeditor import CKEditor
@@ -12,7 +12,7 @@ from flask_ckeditor import CKEditor
 # from werkzeug.security import generate_password_hash, check_password_hash
 # from sqlalchemy.orm import relationship
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
-from forms import CommentForm
+from forms import CommentForm, LoginForm
 # from flask_gravatar import Gravatar
 from datetime import datetime
 # import os
@@ -37,8 +37,8 @@ app.config['SECRET_KEY'] = 'huffingpaint60'
 ckeditor = CKEditor(app)
 Bootstrap(app)
 db = SQLAlchemy(app)
-# login_manager = LoginManager()
-# login_manager.init_app(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 
 # database for all venues
@@ -191,6 +191,12 @@ db.create_all()
 # db.session.commit()
 ####################################### REST API #########################################
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -225,7 +231,7 @@ def create_user_account(username, password, email):
     if form:
         # HAD TO PUT .first() TO GET IT TO WORK, OTHERWISE ALL EMAILS WOULD TRIGGER THIS IF STATEMENT
         if User.query.filter_by(email=form['email']).first() or User.query.filter_by(username=form['username']).first():
-            return redirect(url_for('return_json', json={'messsage': 'there is already an account associated with this email or username'}))
+            return jsonify({'message': 'arg, there be another who bears either the same name, or the same address of electronic mail'})
         to_hash = form['password']
         hash = generate_password_hash(to_hash, method='pbkdf2:sha256', salt_length=8)
         new_user = User(
@@ -235,12 +241,10 @@ def create_user_account(username, password, email):
         )
         db.session.add(new_user)
         db.session.commit()
-        return redirect(
-            url_for('return_json',
-                json={'message': f'Welcome {form["username"]}! Tis a pleasure to have you aboard! You may now post reviews and comments. ',
-                'username': form['username'],
-                'email': form['email']})
-        )
+        return jsonify({'message': f'Welcome {form["username"]}! Tis a pleasure to have you aboard! You may now post reviews and comments. ',
+                        'username': form['username'],
+                        'email': form['email']})
+
     return jsonify({'message': 'create-account'})
 
 # HTML CREATE ACCOUNT #
@@ -249,10 +253,10 @@ def create_account_html():
     ########## This is the html version ###################
     if request.method == 'POST':
         if User.query.filter_by(email=request.form['email']).first() or User.query.filter_by(username=request.form['username']).first():
-            return redirect(url_for('return_json', json={'messsage': 'there is already an account associated with this email or username'}))
-        username = request.form['Username']
-        password = request.form['Password']
-        email = request.form['Email']
+            return redirect(url_for('return_json', dict={'messsage': 'there is already an account associated with this email or username'}))
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
         to_hash = password
         hash = generate_password_hash(to_hash, method='pbkdf2:sha256', salt_length=8)
         new_user = User(
@@ -262,8 +266,8 @@ def create_account_html():
         )
         db.session.add(new_user)
         db.session.commit()
-        message = {'username': new_user['username'], 'email': new_user['email']}
-        return redirect(url_for('return_json', json=message))
+        message = {'username': username, 'email': email}
+        return redirect(url_for('return_json', dict=message))
 
     return render_template('create_user_form.html')
 
@@ -299,7 +303,7 @@ def post_venue_review():
             message = {'review-title': request.form['review-title'],
                        'venue-name': request.form['venue-name'],
                        'review': request.form['review']}
-            return redirect(url_for('return_json', json=message))
+            return redirect(url_for('return_json', dict=message))
         else:
             message = {'Message': 'this venue is not in the database, you should add it! ;)'}
             return jsonify(message)
@@ -459,7 +463,37 @@ def all_show_reviews_html():
     return render_template('all-show-reviews.html', reviews=reviews)
 
 
+################## SESSION MANAGEMENT ####################
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            flash('No user with that email')
+            return redirect(url_for('login'))
+        if user and not check_password_hash(user.password, password):
+            flash('Password is incorrect')
+            return redirect(url_for('login'))
+        if user and check_password_hash(user.password, password):
+            if user.id == 1:
+                admin = True
+                print(admin)
+                print(user.posts)
+                login_user(user)
+                return redirect(url_for('html_venue_reviews', admin=admin))
+            else:
+                login_user(user)
+                return redirect(url_for('html_venue_reviews'))
 
+    return render_template("login.html", form=form, current_user=current_user, year=datetime.now().year)
+
+
+@app.route('/log-out')
+def logout():
+    return({})
 
 
 """
@@ -468,11 +502,11 @@ Worked on  9/16/21: template for forms, css for forms
 //TODO: template for creating show review
 //TODO: add show review to database
 //TODO: update database to include a title for the show review class.
-TODO: start user login 
 //TODO: show venue review
-TODO: page for all venue reviews
-TODO: page for all show reviews
-
+//TODO: page for all venue reviews
+//TODO: page for all show reviews
+//TODO: user login page 
+TODO: admin management
 
 
 

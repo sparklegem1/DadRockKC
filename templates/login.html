@@ -1,0 +1,10 @@
+{% include "site.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block extraheader %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+{% endblock extraheader %}
+  <div class="title">
+
+        {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+
+  </div>

@@ -43,6 +43,7 @@ label {
     margin-bottom: 10px;
 }
 
+
 .left-table {
     position: absolute;
     margin-bottom: 250px;
@@ -123,9 +124,9 @@ img {
 .comment-section {
     margin-top: 50px;
     background-color: #ffffff;
-
 }
 
 .comment-title {
     text-align: center;
 }
+
