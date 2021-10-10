@@ -1,5 +1,7 @@
 {% include "site.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% include "navbar.html" %}
+
 {% block extraheader %}
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
 {% endblock extraheader %}

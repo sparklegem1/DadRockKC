@@ -1,7 +1,10 @@
+from functools import wraps
+
 from flask import Flask, render_template, redirect, url_for, flash, request, jsonify
 from flask_bootstrap import Bootstrap
 from sqlalchemy import column
 from sqlalchemy.orm import relationship
+from werkzeug.exceptions import abort
 from werkzeug.security import generate_password_hash, check_password_hash
 from web_bots import *
 from flask_sqlalchemy import SQLAlchemy
@@ -168,39 +171,42 @@ db.create_all()
 
 
 
-# show = ShowReview(
-#     title='yayy',
-#     artist_names='oops',
-#     venue=Venue.query.filter_by(venue_name='Riot Room').first(),
-#     date='yesterday',
-#     genre='blokes',
-#     price='20',
-#     rating='🦄',
-#     review='suckes',
-#     user_id=1
-# )
-# db.session.add(show)
-# db.session.commit()
 
-# show_comment = ShowComment(
-#     text='weeeeeee',
-#     user_id=1,
-#     show_id=1
-# )
-# db.session.add(show_comment)
-# db.session.commit()
+
 ####################################### REST API #########################################
+
+
+# ADMIN ONLY
+def admin_only(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        try:
+            if current_user.id != 9:
+                return abort(403)
+        except AttributeError:
+            return abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template('404.html'), 404
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-
+# HOME PAGE
 @app.route('/')
 def home():
     return render_template('index.html')
 
+@app.route('/all-bots')
+def all_bots():
+    return render_template('bots.html')
 
 # Knuckleheads scraper
 @app.route('/all-kunckleheads')
@@ -318,6 +324,9 @@ def view_venue_review(id):
     all_comments = requested_venue.comments
 
     if request.method == 'POST':
+        if not current_user.is_authenticated:
+            flash('You must first login to comment')
+            return redirect(url_for('login'))
         comment_form_data = comment.comments.data
         new_comment = VenueComment(
             text=comment_form_data,
@@ -332,7 +341,8 @@ def view_venue_review(id):
 
 # HTML ALL VENUE REVIEWS
 @app.route('/all-venue-reviews', methods=['GET', 'POST'])
-def html_venue_reviews():
+@admin_only
+def all_venue_reviews_html():
     reviews = VenueReview.query.all()
     return render_template('all-venue-reviews.html', reviews=reviews)
 
@@ -370,6 +380,9 @@ def show_review():
     for venue in venues:
         venue_names.append(venue.venue_name)
     if request.method == 'POST':
+        if not current_user.is_authenticated:
+            flash('You must first login to make a review')
+            return redirect(url_for('login'))
         title = request.form['title']
         artist_names = request.form['artists']
         venue_name = request.form['venue']
@@ -394,16 +407,16 @@ def show_review():
     return render_template('add-show-review.html', venue_names=venue_names, unicorns=unicorns)
 
 
-# VIEW SHOW REVIEW #
+# SHOW REVIEW HTML
 @app.route("/show-review/<int:review_id>", methods=['GET', 'POST'])
 def view_show_review(review_id):
     requested_review = ShowReview.query.get(review_id)
     comment = CommentForm()
     all_comments = requested_review.comments
     if request.method == 'POST':
-        # if not current_user.is_authenticated:
-        #     flash('You must first login to comment')
-        #     return redirect(url_for('login'))
+        if not current_user.is_authenticated:
+            flash('You must first login to comment')
+            return redirect(url_for('login'))
         comment_form_data = comment.comments.data
         new_comment = ShowComment(
             text=comment_form_data,
@@ -483,17 +496,38 @@ def login():
                 print(admin)
                 print(user.posts)
                 login_user(user)
-                return redirect(url_for('html_venue_reviews', admin=admin))
+                return redirect(url_for('all_venue_reviews_html', admin=admin))
             else:
                 login_user(user)
-                return redirect(url_for('html_venue_reviews'))
+                return redirect(url_for('all_venue_reviews_html'))
 
     return render_template("login.html", form=form, current_user=current_user, year=datetime.now().year)
 
-
+# LOGOUT
 @app.route('/log-out')
 def logout():
-    return({})
+    logout_user()
+    return redirect(url_for('home', current_user=current_user))
+
+
+@app.route('/delete-venue-review/<int:post_id>')
+def delete_venue_review(post_id):
+    post_to_delete = VenueReview.query.get(post_id)
+    db.session.delete(post_to_delete)
+    db.session.commit()
+    return redirect(url_for('all_venue_reviews_html', current_user=current_user, year=datetime.now().year))
+
+
+@app.route('/delete-show-review/<int:post_id>')
+def delete_show_review(post_id):
+    post_to_delete = ShowReview.query.get(post_id)
+    db.session.delete(post_to_delete)
+    db.session.commit()
+    return redirect(url_for('all_show_reviews_html'))
+
+
+
+
 
 
 """
@@ -506,7 +540,17 @@ Worked on  9/16/21: template for forms, css for forms
 //TODO: page for all venue reviews
 //TODO: page for all show reviews
 //TODO: user login page 
-TODO: admin management
+//TODO: logout 
+//TODO: make navbar look good
+//TODO: admin management
+//TODO: make delete method 
+TODO: Make all posting and commenting exclusive to account holders
+TODO: Fix appearance of posts and comments
+TODO: install iterm 
+TODO: push all items to github
+TODO: host site on heroku / switch to postgre
+
+
 
 
 

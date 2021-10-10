@@ -1,0 +1,33 @@
+{% include "site.html" %}
+<ul class="navlist">
+
+
+
+    {% if not current_user.is_authenticated: %}
+    <li><a href="{{ url_for('create_account_html') }}">Create Account</a></li>
+    {% endif %}
+    <li><a href="{{ url_for('all_bots') }}">Bots</a></li>
+    {% if current_user.is_authenticated %}
+      <li><a href="{{ url_for('logout') }}">Logout</a></li>
+    {% endif %}
+    {% if not current_user.is_authenticated %}
+      <li><a href="{{ url_for('login') }}">Login</a></li>
+
+    {% endif %}
+    <li><a href="{{ url_for('home') }} ">Home</a></li>
+</ul>
+
+
+<!--{% include "site.html" %}-->
+<!--<div class="nav-container">-->
+<!--  <nav>-->
+<!--    <ul>-->
+<!--      <li><a href="">Home</a></li>-->
+<!--      <li><a href="">Login</a></li>-->
+<!--      <li><a href="">Logout</a></li>-->
+<!--      <li><a href="">About</a></li>-->
+<!--      <li><a href="">Contact</a></li>-->
+<!--    </ul>-->
+<!--  </nav>-->
+<!--</div>-->
+

@@ -1,4 +1,8 @@
 
+:root {
+    --background = rgba(85, 214, 170, .85)
+}
+
 body {
    background: #0F5D66;
 
@@ -35,6 +39,7 @@ body {
     padding: 20px;
     font-size: 27px;
     font-family: 'Urbanist', sans-serif;
+    align: center;
 }
 
 label {
@@ -73,6 +78,25 @@ button {
   width: 15%;
 }
 
+btn-primary {
+  background-color: #04AA6D;
+  font-size: 25px;
+  color: white;
+  padding: 14px 20px;
+  margin-top: 20px;
+  margin-left: 10px;
+  border: none;
+  cursor: pointer;
+  width: 15%;
+}
+
+.gnomes {
+    min-width: 100%;
+    margin: 0%;
+    padding-top: 10%;
+    border-radius: 1%;
+}
+
 select {
     width: 25%;
     padding: 12px 20px;
@@ -87,6 +111,9 @@ button:hover {
   opacity: 0.9;
 }
 
+btn:hover {
+  opacity: 0.9;
+}
 .container {
     background-color: #ffffff;
     padding: 25px;
@@ -130,3 +157,57 @@ img {
     text-align: center;
 }
 
+.nav-container {
+    background-color: white;
+    text-align: center;
+    position: fixed;
+    margin: 50px;
+}
+
+nav {
+    position: fixed;
+    color: white;
+    margin: 50px;
+    text-align: left;
+    top: 100%;
+    left: 0%;
+}
+
+ul {
+    list-style-type: None;
+}
+
+.navlist {
+    padding-bottom: 20px;
+    list-style-type: None;
+    margin: 0px;
+    margin-bottom: 69px;
+    background-color: #0F5D66;
+    font-size: 27px;
+    font-family: 'Urbanist', sans-serif;
+}
+
+li {
+    float: right;
+}
+
+li a {
+  display: block;
+  color: #FCFF91;
+  text-decoration: none;
+  padding: 24px 16px;
+  text-decoration: none;
+}
+
+li a:hover {
+  background-color: #a2d173;
+  color: white;
+}
+
+.bot-page-title {
+    color: #FCFF91;
+    font-family: 'Urbanist', sans-serif;
+    font-weight: 700;
+    font-size: 25px;
+    margin: 10vh;
+}

@@ -1,32 +1,12 @@
 {% include "site.html" %}
+{% include "navbar.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block content %}
     <div id="title">Dad Rock KC API</div>
     <div id="top-shelf">
         <h2>this is an api that is useful if you are in Kansas City and you love dad rock, hardcore, or indie music and you want to find cool local shows all in one place</h2>
     </div>
-    <div id="documentaion">
-        <div class="title">
-            <h3>how about some documentation?</h3>
-        </div>
-        <dl>
-              <dt>A title of the graph</dt>
-              <dd class="percentage">
-                <span class="text">
-                  Data 1: 20%
-                </span>
-              </dd>
-              <dd class="percentage">
-                <span class="text">
-                  Data 2: 50%
-                </span>
-              </dd>
-              <dd class="percentage">
-                <span class="text">
-                  Data 3: 30%
-                </span>
-              </dd>
-        </dl>
 
-        </div>
-    </div>
+    <img class="gnomes" src="{{ url_for('static', filename='img/gnomes.JPG')}}"/>
 
-{% include "footer.html" %}
+{% endblock %}

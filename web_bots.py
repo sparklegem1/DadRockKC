@@ -124,7 +124,10 @@ class RiotRoomScraper:
             except NoSuchElementException:
                 date = 'no date available'
             event_time = show.find_element_by_tag_name('span').text.strip('Show| //Doors | ')[:6]
-            title = show.find_element_by_tag_name('h2').text
+            try:
+                title = show.find_element_by_tag_name('h2').text
+            except NoSuchElementException:
+                title = 'no available title'
             try:
                 cost = show.find_element_by_class_name('eventCost').text
             except NoSuchElementException:
