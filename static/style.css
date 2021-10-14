@@ -1,11 +1,16 @@
-
+* {
+  box-sizing: border-box;
+}
 :root {
     --background = rgba(85, 214, 170, .85)
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
    background: #0F5D66;
-
 }
 
 #title {
@@ -34,12 +39,54 @@ body {
 
 }
 
+
+
+#shape {
+     width: 420px;
+     margin-top: 15%;
+     margin-left: 45vh;
+     height: 200px;
+     background: red;
+     background-image: url("img/scoob.jpeg");
+     position: relative;
+     -moz-border-radius: 10px;
+     -webkit-border-radius: 10px;
+     border-radius: 10px;
+}
+#shape:before {
+  content: "";
+  position: absolute;
+  right: 100%;
+  top: 26px;
+  width: 0;
+  height: 0;
+  border-top: 23px solid transparent;
+  border-right: 26px solid;
+  border-bottom: 23px solid transparent;
+
+}
+
+#submit {
+  background-color: #04AA6D;
+  font-size: 25px;
+  color: white;
+  padding: 14px 20px;
+  margin-top: 20px;
+  margin-left: 10px;
+  border: none;
+  cursor: pointer;
+  width: 15%;
+}
 .title {
     margin: 10vh;
     padding: 20px;
     font-size: 27px;
     font-family: 'Urbanist', sans-serif;
     align: center;
+}
+
+.information {
+    color: #FCFF91;
 }
 
 label {
@@ -49,6 +96,79 @@ label {
 }
 
 
+.card2 {
+    width: 1000px;
+    height: 800px;
+    border: 2px solid gray;
+    border-radius: 5%;
+    margin-left: 15vh;
+    margin-top: 50px;
+    color: #ffffff;
+    text-align: center;
+    background-image: url('img/uninicornII.jpeg');
+}
+
+.card2::after {
+    width: 1000px;
+    color: #ffffff;
+    background-color: #04AA6D;
+    background-image: url('img/uninicornII.jpeg');
+
+}
+
+.card2 {
+    width: 1200px;
+    height: 600px;
+    border: 2px solid gray;
+    border-radius: 1%;
+    margin-left: 2.5vh;
+    margin-top: 50px;
+    color: #ffffff;
+    text-align: center;
+    background-image: url('img/uninicornII.jpeg');
+
+}
+/*
+.star-five {
+  margin: 50px 0;
+  position: relative;
+  display: block;
+  color: red;
+  width: 0px;
+  height: 0px;
+  border-right: 100px solid transparent;
+  border-bottom: 70px solid red;
+  border-left: 100px solid transparent;
+  transform: rotate(35deg);
+}
+.star-five:before {
+  border-bottom: 80px solid red;
+  border-left: 30px solid transparent;
+  border-right: 30px solid transparent;
+  position: absolute;
+  height: 0;
+  width: 0;
+  top: -45px;
+  left: -65px;
+  display: block;
+  content: '';
+  transform: rotate(-35deg);
+}
+.star-five:after {
+  position: absolute;
+  display: block;
+  color: red;
+  top: 3px;
+  left: -105px;
+  width: 0px;
+  height: 0px;
+  border-right: 100px solid transparent;
+  border-bottom: 70px solid red;
+  border-left: 100px solid transparent;
+  transform: rotate(-70deg);
+  content: '';
+}
+*/
 .left-table {
     position: absolute;
     margin-bottom: 250px;

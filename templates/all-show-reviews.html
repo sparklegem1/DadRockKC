@@ -4,26 +4,25 @@
 
 <div class="title">
 {% for post in reviews: %}
-    <div class="container">
 
-        <div class="post-heading">
-                <h1>"{{post.title}}"</h1>
-                <h2>Artist Names</h2>
+        <div class="card2">
+                <p>"{{post.title}}"</p>
+                <p>Artist Names</p>
                 <p>{{ post.artist_names }}</p>
                 {% if post.user != None: %}
                 <p>-{{ post.user.username }}</p>
                 {% else: %}
                 <p>-Spongebob</p>
                 {% endif %}
-                <h2 class="subheading">Venue </h2>
+                <p>Venue </p>
                 <p>{{post.venue.venue_name}}</p>
-                <h2>Date</h2>
+                <p>Date</p>
                 <p>{{ post.date }}</p>
-                <h2>Price</h2>
+                <p>Price</p>
                 <p>{{ post.price }}</p>
-                <h2>Rating</h2>
+                <p>Rating</p>
                 <p>🦄🦄🦄🦄</p>
-                <h2>Review</h2>
+                <p>Review</p>
                 <p>{{post.review}}</p>
             </div>
 

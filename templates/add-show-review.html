@@ -1,7 +1,9 @@
 {% include "site.html" %}
 {% include "navbar.html" %}
 
+
 <div class="title">
+    {% if current_user.is_authenticated: %}
     <form action="{{ url_for('show_review') }}" method="post">
         <label>Select Venue</label>
         <select name="venue" method="GET" action="/">
@@ -31,4 +33,12 @@
         <textarea id="venue-review" type="text" placeholder="give us the deets! we wanna know the juice" style="height:200px" name="review"></textarea>
         <button type="submit">🦄</button>
     </form>
+    {% else: %}
+    <h1 class="information">u gotta make an account to post a show review, silly</h1>
+    {% for i in range(1, 5): %}
+    <div class="bgi">
+    <div id="shape"></div>
+    </div>
+    {% endfor %}
+    {% endif %}
 </div>

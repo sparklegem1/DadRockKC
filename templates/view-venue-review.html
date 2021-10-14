@@ -16,8 +16,8 @@
             <p>{{post.venue_name}}</p>
             <h2>Review</h2>
             <p>{{post.review}}</p>
-        </div>
-
+            <a href="{{ url_for('delete_venue_review', post_id=post.id ) }}"><button>delete review</button></a>
+    </div>
 
 </div>
 <div class="comment-section">
@@ -34,6 +34,7 @@
             <div class="avatar-image">
                 <span>{{ comment.comment_author.username }}</span>
                 <img src="{{ url_for('static', filename='img/scoob.jpeg')}}"/>
+                <a href="{{ url_for('delete_comment', id=comment.venue_id, type='venue') }}"><button>Delete</button></a>
             </div>
         </li>
         {% endfor %}

@@ -1,18 +1,25 @@
 {% include "site.html" %}
 {% include "navbar.html" %}
-
 <div class="title">
-    {% if message == True %}
-        <p>sorry! that venue has not been added! Please try another</p>
-    {% endif %}
-    <form action="{{ url_for('post_venue_review') }}" method="post">
-        <label>Title</label>
-        <input type="text" placeholder="name" name="review-title">
-        <label>Venue Name</label>
-        <input type="text" placeholder="password" name="venue-name">
-        <label>Review</label>
-        <textarea id="venue-review" type="text" placeholder="say it dont spray it" style="height:200px" name="review"></textarea>
-        <button type="submit">🦄</button>
-    </form>
+{% if current_user.is_authenticated: %}
 
+        {% if message == True %}
+            <p>sorry! that venue has not been added! Please try another</p>
+        {% endif %}
+        <form action="{{ url_for('post_venue_review') }}" method="post">
+            <label>Title</label>
+            <input type="text" placeholder="name" name="review-title">
+            <label>Venue Name</label>
+            <input type="text" placeholder="password" name="venue-name">
+            <label>Review</label>
+            <textarea id="venue-review" type="text" placeholder="say it dont spray it" style="height:200px" name="review"></textarea>
+            <button type="submit">🦄</button>
+        </form>
+
+
+{% else: %}
+    <div class="title">
+        <h1>U must have an account to add a venue review. just click on "create account" </h1>
+    </div>
+{% endif %}
 </div>

@@ -43,6 +43,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+YOUTUBE_URL = "https://www.youtube.com/channel/UCihF4V5Y1pZUuKQha4vtsIA/videos"
 
 # database for all venues
 
@@ -172,7 +173,6 @@ db.create_all()
 
 
 
-
 ####################################### REST API #########################################
 
 
@@ -193,6 +193,7 @@ def admin_only(f):
 def page_not_found(e):
     # note that we set the 404 status explicitly
     return render_template('404.html'), 404
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -341,7 +342,6 @@ def view_venue_review(id):
 
 # HTML ALL VENUE REVIEWS
 @app.route('/all-venue-reviews', methods=['GET', 'POST'])
-@admin_only
 def all_venue_reviews_html():
     reviews = VenueReview.query.all()
     return render_template('all-venue-reviews.html', reviews=reviews)
@@ -390,15 +390,16 @@ def show_review():
         price = request.form['price']
         rating = request.form['rating']
         review = request.form['review']
+        genre = request.form['genre']
         show_review = ShowReview(
             title=title,
             artist_names=artist_names,
-            venue=venue_name,
+            genre=genre,
             date=date,
             rating=rating,
             review=review,
             price=price,
-            user_id=1,
+            user_id=current_user.id,
             venue_id=Venue.query.filter_by(venue_name=venue_name).first().id
         )
         db.session.add(show_review)
@@ -427,7 +428,7 @@ def view_show_review(review_id):
         db.session.commit()
         return redirect(url_for('view_show_review', review_id=review_id))
 
-    return render_template("show-reviews.html", post=requested_review, show_author=requested_review.user, form=comment, comments=all_comments, current_user="Scoob", year=datetime.now().year)
+    return render_template("show-review.html", post=requested_review, show_author=requested_review.user, form=comment, comments=all_comments, current_user="Scoob", year=datetime.now().year)
 
 
 # SHOW REVIEW JSON
@@ -510,7 +511,9 @@ def logout():
     return redirect(url_for('home', current_user=current_user))
 
 
+# DELETE FUNCTIONS
 @app.route('/delete-venue-review/<int:post_id>')
+@admin_only
 def delete_venue_review(post_id):
     post_to_delete = VenueReview.query.get(post_id)
     db.session.delete(post_to_delete)
@@ -519,15 +522,26 @@ def delete_venue_review(post_id):
 
 
 @app.route('/delete-show-review/<int:post_id>')
+@admin_only
 def delete_show_review(post_id):
     post_to_delete = ShowReview.query.get(post_id)
     db.session.delete(post_to_delete)
     db.session.commit()
     return redirect(url_for('all_show_reviews_html'))
 
-
-
-
+@app.route('/delete-comment/<type>/<int:id>')
+@admin_only
+def delete_comment(id, type):
+    if type == 'show':
+        comment = ShowComment.query.get(id)
+        db.session.delete(comment)
+        db.session.commit()
+        return redirect(url_for('view_show_review', review_id=id))
+    if type == 'venue':
+        comment = VenueComment.query.get(id)
+        db.session.delete(comment)
+        db.session.commit()
+        return redirect(url_for('view_venue_review', id=id))
 
 
 """
@@ -544,7 +558,8 @@ Worked on  9/16/21: template for forms, css for forms
 //TODO: make navbar look good
 //TODO: admin management
 //TODO: make delete method 
-TODO: Make all posting and commenting exclusive to account holders
+//TODO: make bot page
+//TODO: Make all posting and commenting exclusive to account holders
 TODO: Fix appearance of posts and comments
 TODO: install iterm 
 TODO: push all items to github
@@ -553,6 +568,10 @@ TODO: host site on heroku / switch to postgre
 
 
 
+⌘ means Command
+⌥ means Option (also called “Alt”)
+⌃ means Control
+⇧ means Shift
 
 """
 

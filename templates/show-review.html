@@ -3,23 +3,25 @@
 {% include "navbar.html" %}
 
 <div class="title">
-<div class="container">
-
-    <div class="post-heading">
-            <h1>"{{post.title}}"</h1>
-            {% if show_author != None: %}
-            <p>-{{ show_author.username }}</p>
-            {% else: %}
-            <p>-Spongebob</p>
-            {% endif %}
-            <h2 class="subheading">Venue </h2>
-            <p>{{post.venue.venue_name}}</p>
-            <h2>Review</h2>
-            <p>{{post.review}}</p>
-        </div>
 
 
-</div>
+
+    <div class="card2">
+        <p>"{{post.title}}"</p>
+        {% if show_author != None: %}
+        <p>-{{ show_author.username }}</p>
+        {% else: %}
+        <p>-Spongebob</p>
+        {% endif %}
+        <p>Venue </p>
+        <p>{{post.venue.venue_name}}</p>
+        <p>Review</p>
+        <p>{{post.review}}</p>
+        <a href="{{ url_for('delete_show_review', post_id=post.id ) }}"><button>delete review</button></a>
+    </div>
+
+
+
 <div class="comment-section">
     <h2 class="comment-title">Comments</h2>
     <ul class="commentList">
