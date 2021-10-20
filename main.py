@@ -1,28 +1,23 @@
 from functools import wraps
-
+import urllib.request
 from flask import Flask, render_template, redirect, url_for, flash, request, jsonify
 from flask_bootstrap import Bootstrap
 from sqlalchemy import column
 from sqlalchemy.orm import relationship
 from werkzeug.exceptions import abort
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from web_bots import *
 from flask_sqlalchemy import SQLAlchemy
 from flask_ckeditor import CKEditor
-# from datetime import date
-# from functools import wraps
-# from flask import abort
-# from werkzeug.security import generate_password_hash, check_password_hash
-# from sqlalchemy.orm import relationship
+#from flask import abort
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from forms import CommentForm, LoginForm
-# from flask_gravatar import Gravatar
 from datetime import datetime
-# import os
+from image_handler import ImageCropper
 
-
-
-
+import os
+from PIL import Image, UnidentifiedImageError
 
 ############################### API DESCRIPTION ###################################
 # Get all information about local shows from one site with the local gig api
@@ -33,8 +28,9 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+
 #db
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dadrockkc3.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dadrockkc4.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'huffingpaint60'
 ckeditor = CKEditor(app)
@@ -45,14 +41,15 @@ login_manager.init_app(app)
 
 YOUTUBE_URL = "https://www.youtube.com/channel/UCihF4V5Y1pZUuKQha4vtsIA/videos"
 
-# database for all venues
 
+# Table for all venues
 class User(UserMixin, db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(1000))
-    email = db.Column(db.String(100), unique=True)
-    password = db.Column(db.String(100))
+    username = db.Column(db.String(1000), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    profile_picture = db.Column(db.String(200))
 
     #Relationships
     show_reviews = relationship('ShowReview', back_populates='user')
@@ -65,7 +62,16 @@ class User(UserMixin, db.Model):
 
 db.create_all()
 
-# database for all venues
+# Table for image files
+class PPImageFile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    img = db.Column(db.Text, unique=True, nullable=False)
+    name = db.Column(db.Text, nullable=False)
+    mimetype = db.Column(db.Text, nullable=False)
+
+db.create_all()
+
+# Table for venue
 class Venue(db.Model):
     __tablename__ = 'venue'
     id = db.Column(db.Integer, primary_key=True)
@@ -80,7 +86,7 @@ db.create_all()
 
 
 
-# A database for reviews of Shows
+# Table for reviews of Shows
 class ShowReview(db.Model):
     __tablename__ = 'show_review'
     id = db.Column(db.Integer, primary_key=True)
@@ -109,6 +115,7 @@ class ShowReview(db.Model):
 
 db.create_all()
 
+# Table for venue reviews
 class VenueReview(db.Model):
     __tablename__ = 'venue_review'
     id = db.Column(db.Integer, primary_key=True)
@@ -132,6 +139,7 @@ class VenueReview(db.Model):
 
 db.create_all()
 
+# Table for venue comments
 class VenueComment(db.Model):
     __tablename__ = 'venue_comment'
     id = db.Column(db.Integer, primary_key=True)
@@ -151,6 +159,7 @@ class VenueComment(db.Model):
 
 db.create_all()
 
+# Table for show comments
 class ShowComment(db.Model):
     __tablename__ = 'show_comment'
     id = db.Column(db.Integer, primary_key=True)
@@ -264,17 +273,45 @@ def create_account_html():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
+        url = request.form['img_url']
+
+        # HASH PW
         to_hash = password
         hash = generate_password_hash(to_hash, method='pbkdf2:sha256', salt_length=8)
+
+        # CROPPING IMAGE AND SAVING TO DATABASE
+        pic = urllib.request.urlretrieve(url, f"static/img/{username}-profile-pic.png")
+        try:
+            im = Image.open(pic[0])
+            im.show()
+            fn, ext = os.path.splitext(pic[0])
+            print(fn, ext)
+            # im.save(f'static/img/{fn}.png')
+            crop = ImageCropper()
+            crop.crop_image('static/img', 'cropped-imgs')
+            print(os.listdir('static/img'))
+        except UnidentifiedImageError:
+            return jsonify({'message': 'sorry, cant make an image out of this url!'})
+
+        prof_pic = ''
+        for image in os.listdir('static/cropped-imgs'):
+            if f'{username}-profile-pic.png' == image:
+                prof_pic = image
+
+
+
         new_user = User(
             username=username,
             email=email,
-            password=hash
+            password=hash,
+            profile_picture=f'static/cropped-imgs/{prof_pic}'
         )
+
         db.session.add(new_user)
         db.session.commit()
-        message = {'username': username, 'email': email}
-        return redirect(url_for('return_json', dict=message))
+        login_user(new_user)
+
+        return redirect(url_for('user_profile'))
 
     return render_template('create_user_form.html')
 
@@ -478,6 +515,8 @@ def all_show_reviews_html():
 
 
 ################## SESSION MANAGEMENT ####################
+
+# LOGIN
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -495,7 +534,6 @@ def login():
             if user.id == 1:
                 admin = True
                 print(admin)
-                print(user.posts)
                 login_user(user)
                 return redirect(url_for('all_venue_reviews_html', admin=admin))
             else:
@@ -529,6 +567,7 @@ def delete_show_review(post_id):
     db.session.commit()
     return redirect(url_for('all_show_reviews_html'))
 
+
 @app.route('/delete-comment/<type>/<int:id>')
 @admin_only
 def delete_comment(id, type):
@@ -542,6 +581,31 @@ def delete_comment(id, type):
         db.session.delete(comment)
         db.session.commit()
         return redirect(url_for('view_venue_review', id=id))
+
+
+@app.route('/user-profile')
+def user_profile():
+    return render_template('profile.html')
+
+
+
+@app.route('/upload', methods=['GET','POST'])
+def upload_img():
+
+    pic = request.files['pic']
+
+    if not pic:
+        return 'no pic'
+
+    filename = pic.secure_filename()
+    mimetype = pic.mimetype
+
+    img = PPImageFile(img=pic.read(), name=filename, mimetype=mimetype)
+    db.session.add(img)
+    db.session.commit()
+
+    return 'image has been uploaded!'
+
 
 
 """
@@ -561,9 +625,16 @@ Worked on  9/16/21: template for forms, css for forms
 //TODO: make bot page
 //TODO: Make all posting and commenting exclusive to account holders
 TODO: Fix appearance of posts and comments
+TODO: Add profile pictures to users
+TODO: Add profile viewing page where you can edit features of your profile 
+TODO: Make edit functionality to edit button on profile page
 TODO: install iterm 
 TODO: push all items to github
 TODO: host site on heroku / switch to postgre
+TODO: in create_account_html, took url data and saved it as a cropped image in cropped-imgs, now i want
+to save the image into the database to be easily accessed in the html, one method is to use SQLAlchemy-AttachImage but 
+it seems i need to install some obj from the Wand module. 
+ 
 
 
 

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Local Shows API;</title>
+    <link href="{{ url_for('static', filename='pfstyles.css')}}", rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100;0,600;0,700;1,100;1,600&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+</head>
+<body>
+{% if current_user.is_authenticated %}
+<header>
+	<div class="container">
+		<div class="profile">
+			<div class="profile-image">
+				<img src="{{current_user.profile_picture}}" alt="">
+			</div>
+			<div class="profile-user-settings">
+				<h1 class="profile-user-name">{{ current_user.username }} </h1>
+				<button class="btn profile-edit-btn">Edit Profile</button>
+				<button class="btn profile-settings-btn" aria-label="profile settings"><i class="fas fa-cog" aria-hidden="true"></i></button>
+			</div>
+			<div class="profile-stats">
+				<ul>
+					<li><span class="profile-stat-count">0</span> posts</li>
+					<li><span class="profile-stat-count">0</span> likes</li>
+				</ul>
+			</div>
+			<div class="profile-bio">
+				<p><span class="profile-real-name">About</span> Write a discription</p>
+			</div>
+		</div>
+		<!-- End of profile section -->
+	</div>
+	<!-- End of container -->
+</header>
+
+{% endif %}
+</body>

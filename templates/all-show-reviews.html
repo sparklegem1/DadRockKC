@@ -2,11 +2,12 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% include "navbar.html" %}
 
-<div class="title">
 {% for post in reviews: %}
+<div class="review-layout">
 
-        <div class="card2">
-                <p>"{{post.title}}"</p>
+        <div class="show-review">
+                <img src="{{ post.user.profile_picture }}">
+                <h2>"{{post.title}}"</h2>
                 <p>Artist Names</p>
                 <p>{{ post.artist_names }}</p>
                 {% if post.user != None: %}
@@ -24,30 +25,24 @@
                 <p>🦄🦄🦄🦄</p>
                 <p>Review</p>
                 <p>{{post.review}}</p>
-            </div>
-
-
-    </div>
-
-    <div class="comment-section">
-        <h2 class="comment-title">Comments</h2>
-        <ul class="commentList">
-            {% for comment in post.comments: %}
-            <li>
-                <div class="commenterImage">
-
-                </div>
-                <div class="commentText">
-                    <p>{{ comment.text|safe }}</p>
-                </div>
-                <div class="avatar-image">
-                    <span>{{ comment.comment_author.username }}</span>
-                    <img src="{{ url_for('static', filename='img/scoob.jpeg')}}"/>
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
-
-    </div>
-{% endfor %}
+        </div>
 </div>
+<div class="comment-section">
+    <h2 class="comment-title">Comments</h2>
+    <ul class="commentList">
+        {% for comment in comments: %}
+        <li>
+            <div class="commenterImage">
+            </div>
+            <div class="commentText">
+                <p>{{ comment.text|safe }}</p>
+            </div>
+            <div class="avatar-image">
+                <span>{{ comment.comment_author.username }}</span>
+                <img src="{{ url_for('static', filename='img/scoob.jpeg')}}"/>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endfor %}

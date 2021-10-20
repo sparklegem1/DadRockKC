@@ -77,12 +77,19 @@ body {
   cursor: pointer;
   width: 15%;
 }
+
+form {
+   margin-left: 35%;
+}
+
+.form {
+    position: relative;
+
+}
+
 .title {
-    margin: 10vh;
-    padding: 20px;
     font-size: 27px;
     font-family: 'Urbanist', sans-serif;
-    align: center;
 }
 
 .information {
@@ -95,6 +102,28 @@ label {
     margin-bottom: 10px;
 }
 
+.review-layout {
+    padding: 5rem 0;
+}
+
+.review_layout::after {
+
+}
+
+.show-review {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.profile-pic {
+    float: left;
+    width: calc(33.333% - 1rem);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 3rem;
+}
 
 .card2 {
     width: 1000px;
@@ -127,6 +156,32 @@ label {
     text-align: center;
     background-image: url('img/uninicornII.jpeg');
 
+}
+.commentList {
+    padding:0;
+    list-style:none;
+    max-height:200px;
+    overflow:auto;
+}
+.commentList li {
+    margin:0;
+    margin-top:10px;
+}
+.commentList li > div {
+    display:table-cell;
+}
+.commenterImage {
+    width:30px;
+    margin-right:5px;
+    height:100%;
+    float:left;
+}
+.commenterImage img {
+    width:100%;
+    border-radius:50%;
+}
+.commentText p {
+    margin:0;
 }
 /*
 .star-five {
@@ -192,10 +247,14 @@ button {
   color: white;
   padding: 14px 20px;
   margin-top: 20px;
-  margin-left: 10px;
-  border: none;
+  border: 2px solid;
+  border-radius: 2%;
   cursor: pointer;
   width: 15%;
+}
+
+button::hover {
+
 }
 
 btn-primary {
@@ -244,11 +303,7 @@ btn:hover {
     border-radius: 2%;
 }
 
-.comment-section {
-    padding-top: 20px;
-    border-radius: 1%;
 
-}
 
 .avatar-image {
     max-width:20%;
@@ -268,14 +323,7 @@ img {
     margin: 50px;
 }
 
-.comment-section {
-    margin-top: 50px;
-    background-color: #ffffff;
-}
 
-.comment-title {
-    text-align: center;
-}
 
 .nav-container {
     background-color: white;
