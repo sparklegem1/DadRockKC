@@ -89,7 +89,17 @@ form {
 
 .title {
     font-size: 27px;
+    color: #ffffff;
     font-family: 'Urbanist', sans-serif;
+}
+
+.title h1 {
+    text-align: center;
+    color: #FCFF91;
+}
+
+.title h2 {
+    text-align: center;
 }
 
 .information {
@@ -256,8 +266,10 @@ button {
 button::hover {
 
 }
-
-btn-primary {
+.profile-edit-btn {
+    color: white;
+}
+.btn-primary {
   background-color: #04AA6D;
   font-size: 25px;
   color: white;

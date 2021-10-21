@@ -12,3 +12,13 @@ class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired()])
     password = StringField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
+class EditProfile(FlaskForm):
+    username = StringField('New Username', validators=[DataRequired()])
+    img_url = StringField('New URL', validators=[DataRequired()])
+    submit = SubmitField('Switcheroo')
+
+class EditDescription(FlaskForm):
+    description = StringField('write about urself', validators=[DataRequired()])
+    submit = SubmitField('Update')
+

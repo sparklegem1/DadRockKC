@@ -1,0 +1,6 @@
+{% include "site.html" %}
+{% include "navbar.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+<div class="title">
+    {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+</div>

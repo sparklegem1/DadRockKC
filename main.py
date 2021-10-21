@@ -12,7 +12,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_ckeditor import CKEditor
 #from flask import abort
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
-from forms import CommentForm, LoginForm
+from forms import CommentForm, LoginForm, EditProfile, EditDescription
 from datetime import datetime
 from image_handler import ImageCropper
 
@@ -50,6 +50,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     profile_picture = db.Column(db.String(200))
+    pic_edit_count = db.Column(db.Integer)
+    description = db.Column(db.String(100))
 
     #Relationships
     show_reviews = relationship('ShowReview', back_populates='user')
@@ -298,13 +300,12 @@ def create_account_html():
             if f'{username}-profile-pic.png' == image:
                 prof_pic = image
 
-
-
         new_user = User(
             username=username,
             email=email,
             password=hash,
-            profile_picture=f'static/cropped-imgs/{prof_pic}'
+            profile_picture=f'static/cropped-imgs/{prof_pic}',
+            description='Write a description'
         )
 
         db.session.add(new_user)
@@ -582,11 +583,52 @@ def delete_comment(id, type):
         db.session.commit()
         return redirect(url_for('view_venue_review', id=id))
 
-
+# PROFILE FUNCS
 @app.route('/user-profile')
 def user_profile():
     return render_template('profile.html')
 
+# EDIT PROFILE
+@app.route('/edit-profile', methods=['GET', 'POST'])
+def edit_profile():
+    user = User.query.get(current_user.id)
+    form = EditProfile(
+        username=user.username,
+        img_url='new image url'
+    )
+    if form.validate_on_submit():
+        if user.username != form.username.data:
+            user.username=form.username.data
+        if form.img_url.data != 'new image url':
+            pic = urllib.request.urlretrieve(form.img_url.data, f"static/img/{user.username}-profile-pic.png")
+            try:
+                im = Image.open(pic[0])
+                im.show()
+                crop = ImageCropper()
+                crop.crop_image('static/img', 'cropped-imgs')
+                print(os.listdir('static/img'))
+            except UnidentifiedImageError:
+                return jsonify({'message': 'sorry, cant make an image out of this url!'})
+
+            for image in os.listdir('static/cropped-imgs'):
+                if f'{user.username}-profile-pic.png' == image:
+                    user.profile_picture = f'static/cropped-imgs/{image}'
+
+        db.session.commit()
+        return redirect(url_for('user_profile'))
+    return render_template('edit-profile.html', form=form)
+
+# PROFILE DESCRIPTION
+@app.route('/description', methods=['GET', 'POST'])
+def edit_description():
+    form = EditDescription(
+        description=current_user.description
+    )
+    if form.validate_on_submit():
+        current_user.description = form.description.data
+        db.session.commit()
+        return redirect(url_for('user_profile'))
+    return render_template('edit-description.html', form=form)
 
 
 @app.route('/upload', methods=['GET','POST'])
@@ -624,16 +666,15 @@ Worked on  9/16/21: template for forms, css for forms
 //TODO: make delete method 
 //TODO: make bot page
 //TODO: Make all posting and commenting exclusive to account holders
-TODO: Fix appearance of posts and comments
-TODO: Add profile pictures to users
-TODO: Add profile viewing page where you can edit features of your profile 
-TODO: Make edit functionality to edit button on profile page
+TODO: Fix All Appearances
+TODO: Commit Pics To db
+//TODO: Add profile pictures to users
+//TODO: Add profile viewing page where you can edit features of your profile 
+//TODO: Make edit functionality to edit button on profile page
 TODO: install iterm 
 TODO: push all items to github
 TODO: host site on heroku / switch to postgre
-TODO: in create_account_html, took url data and saved it as a cropped image in cropped-imgs, now i want
-to save the image into the database to be easily accessed in the html, one method is to use SQLAlchemy-AttachImage but 
-it seems i need to install some obj from the Wand module. 
+
  
 
 
