@@ -1,0 +1,166 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+    --background = rgba(85, 214, 170, .85)
+}
+
+
+html, body {
+  height: 100%;
+}
+
+body {
+   background: #0F5D66;
+   margin: 0px;
+}
+
+.container {
+    color: #FCFF91;
+    font-family: 'Urbanist', sans-serif;
+
+
+}
+
+
+
+.show-review-header {
+     text-align: center;
+     font-family: 'Urbanist', sans-serif;
+	 width: 100%;
+	 font-weight: 900;
+	 font-size: 1.618rem;
+	 letter-spacing: 0.1ch;
+	 line-height: 1;
+	 padding-bottom: 0.5em;
+	 margin-bottom: 1rem;
+	 position: relative;
+	 font-weight: 700;
+     font-size: 45px;
+}
+
+.show-review-header:after {
+	 display: block;
+	 content: '';
+	 position: relative;
+	 align-items: center;
+	 margin-left: 50%;
+	 border-radius: 10%;
+	 width: 120px;
+	 height: 10px;
+	 background: linear-gradient(135deg, #0F5D66, #FCFF91);
+	 bottom: 0;
+}
+
+.description {
+	 width: 100%;
+	 margin-top: 0;
+	 margin-left: 1rem;
+	 margin-bottom: 3rem;
+	 text-align: center;
+
+}
+
+.card {
+    color: inherit;
+    cursor: pointer;
+    width: calc(33% - 3rem);
+    min-width: calc(33% - 3rem);
+    height: 400px;
+    min-height: 400px;
+    perspective: 1000px;
+    margin: 1em auto;
+    position: relative;
+}
+
+.back {
+	 display: flex;
+	 background-color: #8FD1A2;
+	 border-radius: 6px;
+	 background-position: center;
+	 background-size: cover;
+	 text-align: center;
+	 justify-content: center;
+	 align-items: center;
+	 padding-top: 3rem;
+	 padding-bottom: 3rem;
+	 position: absolute;
+	 height: auto;
+	 width: 100%;
+	 -webkit-backface-visibility: hidden;
+	 backface-visibility: hidden;
+
+}
+
+.back:before,
+.back:after {
+    content : "";
+    display : table;
+}
+.back:after {
+    clear : both;
+}
+
+.title {
+    margin-top: 0px;
+    margin-bottom: 25px;
+}
+
+.venue-name {
+    font-weight: 700;
+}
+
+.add-review-button {
+    position: fixed;
+    top: 500px;
+    margin-left: 150px;
+    border-radius: 5px;
+    border: 5px solid #8FD1A2;
+    color: #8FD1A2;
+    font-weight: 600;
+    height: auto;
+    width: auto;
+    padding: 10px;
+}
+a {
+    text-decoration: none;
+    color: #8FD1A2;
+}
+.overview {
+    color: black;
+    padding: 0 4rem 0 4rem;
+}
+
+ .button {
+	 transform: translateZ(40px);
+	 cursor: pointer;
+	 -webkit-backface-visibility: hidden;
+	 backface-visibility: hidden;
+	 font-weight: bold;
+	 color: #fff;
+	 padding: 0.5em 1em;
+	 border-radius: 100px;
+	 font: inherit;
+	 background: #0F5D66;
+	 border: none;
+	 position: relative;
+	 transform-style: preserve-3d;
+	 transition: 300ms ease;
+}
+ .button:before {
+	 transition: 300ms ease;
+	 position: absolute;
+	 display: block;
+	 content: '';
+	 transform: translateZ(-40px);
+	 -webkit-backface-visibility: hidden;
+	 backface-visibility: hidden;
+	 height: calc(100% - 20px);
+	 width: calc(100% - 20px);
+	 border-radius: 100px;
+	 left: 10px;
+	 top: 16px;
+	 box-shadow: 0 0 10px 10px rgba(26, 87, 230, 0.25);
+	 background-color: rgba(26, 87, 230, 0.25);
+}

@@ -11,7 +11,7 @@ from web_bots import *
 from flask_sqlalchemy import SQLAlchemy
 from flask_ckeditor import CKEditor
 #from flask import abort
-from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
 from forms import CommentForm, LoginForm, EditProfile, EditDescription
 from datetime import datetime
 from image_handler import ImageCropper
@@ -83,6 +83,9 @@ class Venue(db.Model):
     #reviews relationship
     venue_reviews = relationship('VenueReview', back_populates='parent_post')
     show_reviews = relationship('ShowReview', back_populates='venue')
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
     #
 db.create_all()
 
@@ -99,7 +102,8 @@ class ShowReview(db.Model):
     genre = db.Column(db.String(15), nullable=False)
     price = db.Column(db.Float(20), nullable=False)
     rating = db.Column(db.String(10), nullable=False)
-    review = db.Column(db.String(2000), nullable=False)
+    # CHANGE REVIEW LENGTH TO ONLY 200
+    review = db.Column(db.String(200), nullable=False)
 
     #User relationship
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -192,7 +196,7 @@ def admin_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         try:
-            if current_user.id != 9:
+            if current_user.id != 1:
                 return abort(403)
         except AttributeError:
             return abort(403)
@@ -328,7 +332,7 @@ def add_venue():
             db.session.add(new_venue)
             db.session.commit()
             data = {'venue-name': request.form['venue-name'], 'city': request.form['city']}
-            return redirect(url_for('return_json', json=data))
+            return jsonify(new_venue.to_dict())
     return render_template('add-venue.html')
 
 # POST VENUE REVUEW #
@@ -382,7 +386,10 @@ def view_venue_review(id):
 @app.route('/all-venue-reviews', methods=['GET', 'POST'])
 def all_venue_reviews_html():
     reviews = VenueReview.query.all()
-    return render_template('all-venue-reviews.html', reviews=reviews)
+    all_cities = []
+    for review in reviews:
+        all_cities.append(Venue.query.get(review.venue_id).city)
+    return render_template('all-venue-reviews.html', reviews=reviews, cities=all_cities)
 
 
 # JSON VENUE REVIEW
@@ -409,7 +416,7 @@ def all_venue_reviews():
         review_data.append(review_dict)
     return jsonify({'reviews': review_data})
 
-# SHOW REVIEW #
+# ADD SHOW REVIEW
 @app.route('/add-show-review', methods=['GET', 'POST'])
 def show_review():
     venues = Venue.query.all()
@@ -442,7 +449,7 @@ def show_review():
         )
         db.session.add(show_review)
         db.session.commit()
-        return jsonify({'title': title, 'review': review})
+        return redirect(url_for('all_show_reviews_html'))
     return render_template('add-show-review.html', venue_names=venue_names, unicorns=unicorns)
 
 
@@ -630,6 +637,28 @@ def edit_description():
         return redirect(url_for('user_profile'))
     return render_template('edit-description.html', form=form)
 
+# EDIT SHOW REVIEW
+@app.route('/edit-show-review/<int:id>', methods=['GET', 'POST'])
+def edit_show_review(id):
+    review = ShowReview.query.get(id)
+    unicorns = ["🦄", "🦄", "🦄", "🦄", "🦄"]
+    if request.method == 'POST':
+        review.rating = request.form['rating']
+        review.review = request.form['review']
+        db.session.commit()
+        return redirect(url_for('all_show_reviews_html'))
+    return render_template("edit-show-review.html", unicorns=unicorns, review=review)
+
+# EDIT VENUE REVIEW
+@app.route('/edit-venue-review/<int:id>', methods=['GET', 'POST'])
+def edit_venue_review(id):
+    review = VenueReview.query.get(id)
+    if request.method == 'POST':
+        review.review = request.form['review']
+        db.session.commit()
+        return redirect(url_for('all_venue_reviews_html'))
+    return render_template('edit-venue-review.html')
+
 
 @app.route('/upload', methods=['GET','POST'])
 def upload_img():
@@ -652,7 +681,7 @@ def upload_img():
 
 """
 
-Worked on  9/16/21: template for forms, css for forms
+
 //TODO: template for creating show review
 //TODO: add show review to database
 //TODO: update database to include a title for the show review class.
@@ -667,6 +696,7 @@ Worked on  9/16/21: template for forms, css for forms
 //TODO: make bot page
 //TODO: Make all posting and commenting exclusive to account holders
 TODO: Fix All Appearances
+TODO: Update all venue reviews page
 TODO: Commit Pics To db
 //TODO: Add profile pictures to users
 //TODO: Add profile viewing page where you can edit features of your profile 
