@@ -1,0 +1,11 @@
+{% include "site.html" %}
+{% include "navbar.html" %}
+<div class="title">
+  <h1>If you would like me to make a web bot for the website of your fav venue, request it here!</h1>
+        <form action="{{ url_for('request_bot') }}" method="post">
+            <label>Url of Webstite</label>
+            <input type="text" placeholder="enter the url you want me to scrape" name="request">
+            <button>Submit</button>
+        </form>
+</div>
+{% include "footer.html" %}

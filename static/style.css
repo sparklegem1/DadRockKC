@@ -19,25 +19,36 @@ body {
     font-family: 'Urbanist', sans-serif;
     font-weight: 700;
     font-size: 45px;
-    margin: 10vh;
+    text-align: center;
 
 }
 
 #top-shelf {
     color: #8FD1A2;
     font-size: 35px;
-    margin: 10vh;
+    margin: auto;
     width: 50%;
     font-family: 'Urbanist', sans-serif;
 }
 
-#documentaion {
-    color: #000000;
-    background: #F3F3F3;
-    margin-left: 0px;
-    margin-right: 0px;
-    margin-top: 10px;
+.subhead {
+    color: #8FD1A2;
+}
 
+.dashboard {
+    text-align: center;
+}
+
+.dash-item {
+    color: #FCFF91;
+    text-decoration: none;
+    display: inline-block;
+    padding: 20px;
+}
+
+.dash-item:hover {
+    font-size: 30px;
+    color: #ff7df0;
 }
 
 
@@ -137,70 +148,17 @@ label {
     margin-right: 3rem;
 }
 
-.card2 {
-    width: 1000px;
-    height: 800px;
-    border: 2px solid gray;
-    border-radius: 5%;
-    margin-left: 15vh;
-    margin-top: 50px;
-    color: #ffffff;
-    text-align: center;
-    background-image: url('img/uninicornII.jpeg');
-}
 
-.card2::after {
-    width: 1000px;
-    color: #ffffff;
-    background-color: #04AA6D;
-    background-image: url('img/uninicornII.jpeg');
-
-}
-
-.card2 {
-    width: 1200px;
-    height: 600px;
-    border: 2px solid gray;
-    border-radius: 1%;
-    margin-left: 2.5vh;
-    margin-top: 50px;
-    color: #ffffff;
-    text-align: center;
-    background-image: url('img/uninicornII.jpeg');
-
-}
 
 label {
     color: #FCFF91;
 }
 
-.commentList {
-    padding:0;
-    list-style:none;
-    max-height:200px;
-    overflow:auto;
-}
-.commentList li {
-    margin:0;
-    margin-top:10px;
-}
-.commentList li > div {
-    display:table-cell;
-}
-.commenterImage {
-    width:30px;
-    margin-right:5px;
-    height:100%;
-    float:left;
-}
-.commenterImage img {
-    width:100%;
-    border-radius:50%;
-}
-.commentText p {
-    margin:0;
-}
 
+.editor {
+    margin-right: 25%;
+
+}
 
 .left-table {
     position: absolute;
@@ -270,6 +228,7 @@ button::hover {
     border: 0px;
     display: none;
     cursor: pointer;
+
 }
 
 #hamburger::hover {
@@ -300,15 +259,7 @@ button:hover {
 btn:hover {
   opacity: 0.9;
 }
-/* .container {
-    background-color: #ffffff;
-    padding: 25px;
-    text-align: center;
-    margin-left: 35%;
-    margin-bottom: 150px;
-    width: 15%;
-    border-radius: 2%;
-} */
+
 
 
 
@@ -331,8 +282,10 @@ btn:hover {
     font-weight: 600;
     padding-bottom: 25px;
     height:auto;
-
+    margin-block-start: 0em;
+    margin-block-end: 0em;
 }
+
 img {
     max-width:20%;
     height:auto;
@@ -375,7 +328,13 @@ ul {
     font-size: 27px;
     font-family: 'Urbanist', sans-serif;
 }
+.comment-a {
+    color: #8FD1A2;
+    font-size: 20px;
+    text-decoration: none;
+    padding: 0px;
 
+}
 li {
     float: right;
 }
@@ -401,6 +360,44 @@ li a:hover {
     margin: 10vh;
 }
 
+.comment-section {
+    padding:0;
+    background-color: white;
+    margin-left: 34%;
+    max-height:200px;
+    max-width: 500px;
+    overflow:auto;
+}
+.commentList {
+    margin:0;
+    float: left;
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+.commentText p {
+    width: 100%;
+    color: black;
+    margin: 7px 0px 2px 0px;
+    display: inline-block;
+}
+
+.commentText .commenter-name {
+    color: #8FD1A2;
+    font-size: 20px;
+
+}
+
+
+
+.comment {
+    margin: 0px;
+    font-size: 20px;
+}
+
+
 
 @media screen and (max-width: 767px) {
     .navlist {
@@ -420,12 +417,12 @@ li a:hover {
     }
 
     #title {
-        text-align: center;
+        text-align:center;
 
     }
 
     #top-shelf {
-        text-align: center;
+        text-align: left;
     }
 
     input[type=text], textarea {

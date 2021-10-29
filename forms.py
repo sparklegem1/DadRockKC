@@ -16,7 +16,7 @@ class LoginForm(FlaskForm):
 class EditProfile(FlaskForm):
     username = StringField('New Username', validators=[DataRequired()])
     img_url = StringField('New URL', validators=[DataRequired()])
-    submit = SubmitField('Switcheroo')
+    submit = SubmitField('Edit')
 
 class EditDescription(FlaskForm):
     description = StringField('write about urself', validators=[DataRequired()])

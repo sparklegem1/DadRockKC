@@ -185,7 +185,12 @@ class ShowComment(db.Model):
 
 db.create_all()
 
-
+# class Gig(db.Model):
+#     __tablename__ = 'gig'
+#     id = db.Column(db.Integer, primary_key=True)
+#     date = db.Column(db.String(15), nullable=False)
+#     artist_names =db.Column(db.String(100), nullable=False)
+#     genre = db.Column(db.String(100), nullable=False)
 
 
 ####################################### REST API #########################################
@@ -285,7 +290,7 @@ def create_account_html():
         to_hash = password
         hash = generate_password_hash(to_hash, method='pbkdf2:sha256', salt_length=8)
 
-        # CROPPING IMAGE AND SAVING TO DATABASE
+        # CROPPING IMAGE AND SAVING TO FILESYSTEM
         pic = urllib.request.urlretrieve(url, f"static/img/{username}-profile-pic.png")
         try:
             im = Image.open(pic[0])
@@ -335,7 +340,7 @@ def add_venue():
             return jsonify(new_venue.to_dict())
     return render_template('add-venue.html')
 
-# POST VENUE REVUEW #
+# POST VENUE REVIEW
 @app.route('/post-venue-review', methods=['GET', 'POST'])
 def post_venue_review():
     if request.method == 'POST':
@@ -363,17 +368,12 @@ def post_venue_review():
 @app.route('/venue-review/<int:id>', methods=['GET', 'POST'])
 def view_venue_review(id):
     requested_venue = VenueReview.query.get(id)
-    comment = CommentForm()
     all_comments = requested_venue.comments
-
     if request.method == 'POST':
-        if not current_user.is_authenticated:
-            flash('You must first login to comment')
-            return redirect(url_for('login'))
-        comment_form_data = comment.comments.data
+
         new_comment = VenueComment(
-            text=comment_form_data,
-            user_id=1,
+            text="",
+            user_id=current_user.id,
             venue_id=requested_venue.id
         )
         db.session.add(new_comment)
@@ -457,23 +457,23 @@ def show_review():
 @app.route("/show-review/<int:review_id>", methods=['GET', 'POST'])
 def view_show_review(review_id):
     requested_review = ShowReview.query.get(review_id)
-    comment = CommentForm()
     all_comments = requested_review.comments
     if request.method == 'POST':
-        if not current_user.is_authenticated:
-            flash('You must first login to comment')
-            return redirect(url_for('login'))
-        comment_form_data = comment.comments.data
+
         new_comment = ShowComment(
-            text=comment_form_data,
-            user_id=1,
+            text=request.form['comment'],
+            user_id=current_user.id,
             show_id=requested_review.id
         )
         db.session.add(new_comment)
         db.session.commit()
         return redirect(url_for('view_show_review', review_id=review_id))
 
-    return render_template("show-review.html", post=requested_review, show_author=requested_review.user, form=comment, comments=all_comments, current_user="Scoob", year=datetime.now().year)
+    return render_template("show-review.html",
+                           post=requested_review,
+                           comments=all_comments,
+                           current_user=current_user,
+                           year=datetime.now().year)
 
 
 # SHOW REVIEW JSON
@@ -593,7 +593,26 @@ def delete_comment(id, type):
 # PROFILE FUNCS
 @app.route('/user-profile')
 def user_profile():
-    return render_template('profile.html')
+    post_count = 0
+    for item in VenueReview.query.all():
+        if item.user_id == current_user.id:
+            post_count += 1
+    for item in ShowReview.query.all():
+        if item.user_id == current_user.id:
+            post_count += 1
+    return render_template('profile.html', post_count=str(post_count))
+
+@app.route('/show-profile/<username>')
+def show_profile(username):
+    user = User.query.filter_by(username=username).first()
+    post_count = 0
+    for item in VenueReview.query.all():
+        if item.user_id == user.id:
+            post_count += 1
+    for item in ShowReview.query.all():
+        if item.user_id == user.id:
+            post_count += 1
+    return render_template('show-profile.html', user=user, post_count=post_count)
 
 # EDIT PROFILE
 @app.route('/edit-profile', methods=['GET', 'POST'])
@@ -626,13 +645,14 @@ def edit_profile():
     return render_template('edit-profile.html', form=form)
 
 # PROFILE DESCRIPTION
-@app.route('/description', methods=['GET', 'POST'])
-def edit_description():
+@app.route('/description/<int:id>', methods=['GET', 'POST'])
+def edit_description(id):
+    user = User.query.get(id)
     form = EditDescription(
-        description=current_user.description
+        description=user.description
     )
     if form.validate_on_submit():
-        current_user.description = form.description.data
+        user.description = form.description.data
         db.session.commit()
         return redirect(url_for('user_profile'))
     return render_template('edit-description.html', form=form)
@@ -657,25 +677,30 @@ def edit_venue_review(id):
         review.review = request.form['review']
         db.session.commit()
         return redirect(url_for('all_venue_reviews_html'))
-    return render_template('edit-venue-review.html')
+    return render_template('edit-venue-review.html', review=review)
+
+# REQUEST BOT
+@app.route('/request-bot', methods=['GET', 'POST'])
+def request_bot():
+    if request.method == 'POST':
+        with open('potential-bots.txt', 'a') as bots:
+            bots.write(request.form['request'] + '\n')
+        return redirect(url_for('home'))
+    return render_template('request-bot.html')
 
 
-@app.route('/upload', methods=['GET','POST'])
-def upload_img():
 
-    pic = request.files['pic']
-
-    if not pic:
-        return 'no pic'
-
-    filename = pic.secure_filename()
-    mimetype = pic.mimetype
-
-    img = PPImageFile(img=pic.read(), name=filename, mimetype=mimetype)
-    db.session.add(img)
-    db.session.commit()
-
-    return 'image has been uploaded!'
+# @app.route('/add-gig', methods=['GET', 'POST'])
+# def add_gig():
+#     if request.method == 'POST':
+#         new_gig = Gig(
+#             date=request.form['date'],
+#             title=request.form['title'],
+#             genre=request.form['genre'],
+#             artist_names=request.form['artists']
+#         )
+#     return render_template('add-gig.html')
+#
 
 
 
@@ -695,9 +720,13 @@ def upload_img():
 //TODO: make delete method 
 //TODO: make bot page
 //TODO: Make all posting and commenting exclusive to account holders
-TODO: Fix All Appearances
-TODO: Update all venue reviews page
+TODO: add comments
+TODO: view individual reviews
+TODO: add profile button to navbar
+TODO: make profile pages available by clicking username
+//TODO: Update all venue reviews page
 TODO: Commit Pics To db
+TODO: Create Gig object
 //TODO: Add profile pictures to users
 //TODO: Add profile viewing page where you can edit features of your profile 
 //TODO: Make edit functionality to edit button on profile page

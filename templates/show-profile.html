@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Local Shows API;</title>
-    <link href="{{ url_for('static', filename='pfstyles.css')}}", rel="stylesheet">
+    <link href="{{ url_for('static', filename='pfstyles.css')}}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100;0,600;0,700;1,100;1,600&display=swap" rel="stylesheet">
@@ -35,11 +35,11 @@
 	<div class="container">
 		<div class="profile">
 			<div class="profile-image">
-				<img src="{{current_user.profile_picture}}" alt="">
+				<img src="{{user.profile_picture}}" alt="">
 			</div>
 			<div class="profile-user-settings">
-				<h1 class="profile-user-name">{{ current_user.username }} </h1>
-				<a href="{{url_for('edit_profile') }}"><button class="btn profile-edit-btn">Edit Profile</button></a>
+				<h1 class="profile-user-name">{{ user.username }} </h1>
+				<a class="comment-a" href="{{url_for('edit_profile') }}"><button class="btn profile-edit-btn">Edit Profile</button></a>
 			</div>
 			<div class="profile-stats">
 				<ul>
@@ -47,7 +47,7 @@
 				</ul>
 			</div>
 			<div class="profile-bio">
-				<p><span class="profile-real-name">About</span><a href="{{url_for('edit_description', id=current_user.id)}}">{{ current_user.description }}</a></p>
+				<p><span class="profile-real-name">About</span><a href="{{url_for('edit_description', id=user.id)}}">{{ user.description }}</a></p>
 			</div>
 		</div>
 		<!-- End of profile section -->

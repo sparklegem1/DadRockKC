@@ -6,7 +6,7 @@
 {% endblock extraheader %}
 <div class="title edit-page">
     <h1>Edit Profile</h1>
-    <h2>do not edit fields you dont wish to change... </h2>
+    <h2 class="subhead">do not edit fields you dont wish to change... </h2>
     {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
 </div>
 {% include "footer.html" %}

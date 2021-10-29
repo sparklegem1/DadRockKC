@@ -2,12 +2,28 @@
 {% include "navbar.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 {% block content %}
-    <div id="title">Dad Rock KC API</div>
+    <div id="title">Dad Rock KC</div>
     <div id="top-shelf">
-        <h2>this is an api that is useful if you are in Kansas City and you love dad rock, hardcore, or indie music and you want to find cool local shows all in one place</h2>
+        <h2>post about shows you've been to recently, review local venues, share your experiences, or use the API to get all the review data and add it to your own app. you can also use my bots to get some show information from different venues</h2>
     </div>
 
-    <a href="https://www.youtube.com/channel/UCihF4V5Y1pZUuKQha4vtsIA/videos"><img class="gnomes"  src="{{ url_for('static', filename='img/gnomes.JPG')}}"/></a>
 
+    <div class="title">
+    <div class="dashboard">
+
+        <a class="dash-item" href="{{ url_for('all_venue_reviews_html') }}"><h2>All Venue Reviews</h2></a>
+        <a class="dash-item" href="{{ url_for('all_show_reviews_html') }} "><h2>All Show Reviews</h2></a>
+
+    </div>
+
+
+    <div class="dashboard">
+
+        <a class="dash-item" href="{{ url_for('add_venue') }}"><h2>Add a new Venue!</h2></a>
+        <a class="dash-item" href="{{ url_for('request_bot') }} "><h2>Request a web bot!</h2></a>
+
+    </div>
+    </div>
+    <a href="https://www.youtube.com/channel/UCihF4V5Y1pZUuKQha4vtsIA/videos"><img class="gnomes"  src="{{ url_for('static', filename='img/gnomes.JPG')}}"/></a>
 {% endblock %}
 {% include "footer.html" %}
