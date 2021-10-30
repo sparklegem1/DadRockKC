@@ -372,7 +372,7 @@ def view_venue_review(id):
     if request.method == 'POST':
 
         new_comment = VenueComment(
-            text="",
+            text=request.form['comment'],
             user_id=current_user.id,
             venue_id=requested_venue.id
         )
@@ -380,7 +380,7 @@ def view_venue_review(id):
         db.session.commit()
         return redirect(url_for('view_venue_review', id=id))
 
-    return render_template('view-venue-review.html', post=requested_venue, comments=all_comments, form=comment, review_author=requested_venue.user, year=datetime.now().year)
+    return render_template('view-venue-review.html', post=requested_venue, comments=all_comments,  review_author=requested_venue.user, year=datetime.now().year)
 
 # HTML ALL VENUE REVIEWS
 @app.route('/all-venue-reviews', methods=['GET', 'POST'])
@@ -720,17 +720,16 @@ def request_bot():
 //TODO: make delete method 
 //TODO: make bot page
 //TODO: Make all posting and commenting exclusive to account holders
-TODO: add comments
-TODO: view individual reviews
-TODO: add profile button to navbar
-TODO: make profile pages available by clicking username
+//TODO: add comments
+//TODO: view individual reviews
+//TODO: add profile button to navbar
+TODO: Catch all errors in forms
+//TODO: make profile pages available by clicking username
 //TODO: Update all venue reviews page
-TODO: Commit Pics To db
-TODO: Create Gig object
 //TODO: Add profile pictures to users
 //TODO: Add profile viewing page where you can edit features of your profile 
 //TODO: Make edit functionality to edit button on profile page
-TODO: install iterm 
+//TODO: install iterm 
 TODO: push all items to github
 TODO: host site on heroku / switch to postgre
 

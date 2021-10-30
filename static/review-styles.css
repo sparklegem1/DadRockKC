@@ -64,6 +64,10 @@ body {
 
 }
 
+.title {
+    cursor: pointer;
+}
+
 span {
     color: #FCFF91;
 }

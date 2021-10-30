@@ -30,16 +30,15 @@
 <button class="habmurger" id="hamburger">
         <i class="fas fa-bars"></i>
 </button>
-{% if current_user.is_authenticated %}
 <header>
 	<div class="container">
 		<div class="profile">
 			<div class="profile-image">
-				<img src="{{user.profile_picture}}" alt="">
+				<img src="./{{ current_user.profile_picture }}" alt="">
 			</div>
 			<div class="profile-user-settings">
 				<h1 class="profile-user-name">{{ user.username }} </h1>
-				<a class="comment-a" href="{{url_for('edit_profile') }}"><button class="btn profile-edit-btn">Edit Profile</button></a>
+
 			</div>
 			<div class="profile-stats">
 				<ul>
@@ -47,13 +46,15 @@
 				</ul>
 			</div>
 			<div class="profile-bio">
-				<p><span class="profile-real-name">About</span><a href="{{url_for('edit_description', id=user.id)}}">{{ user.description }}</a></p>
+                {% if user.description == "Write a description" %}
+                <p><span class="profile-real-name">About</span> no description yet</p>
+                {% else: %}
+				<p><span class="profile-real-name">About</span> {{ user.description }}</p>
+                {% endif %}
 			</div>
 		</div>
 		<!-- End of profile section -->
 	</div>
 	<!-- End of container -->
 </header>
-
-{% endif %}
 {% include "footer.html" %}

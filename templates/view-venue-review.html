@@ -1,50 +1,67 @@
-{% include "site.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Local Shows API;</title>
+    <link href="{{ url_for('static', filename='review-styles.css')}}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100;0,600;0,700;1,100;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+</head>
+<body>
+
 {% import "bootstrap/wtf.html" as wtf %}
 {% include "navbar.html" %}
 
-<div class="title">
-<div class="review-layout">
 
-    <div class="card2">
-            <h1>"{{post.review_title}}"</h1>
-            {% if review_author != None: %}
-            <p>-{{ review_author.username }}</p>
-            {% else: %}
-            <p>-Spongebob</p>
+
+
+<div class="space"></div>
+<div class="container">
+  <div class="card">
+    <div class="back">
+        <div>
+            <div class="title">"{{ post.review_title }}"</div>
+            <p class="review"><span class="venue-name">Venue: </span>{{ post.venue_name }}</p>
+            <p class="review"><span class="venue-name">City: </span>{{ post.parent_post.city }}</p>
+            <p class="overview">{{ post.venue_review }}</p>
+            <p class="review"><span class="venue-name">Post by </span>{{ post.user.username }}</p>
+            {% if post.user_id == current_user.id: %}
+            <a href="{{ url_for('edit_show_review', id=post.id) }}" class="button edit-btn">Edit</a>
+            <a href="{{ url_for('delete_show_review', post_id=post.id) }}" class="button delete-btn">Delete</a>
             {% endif %}
-            <h2 class="subheading">Venue </h2>
-            <p>{{post.venue_name}}</p>
-            <h2>Review</h2>
-            <p>{{post.review}}</p>
-            <a href="{{ url_for('delete_venue_review', post_id=post.id ) }}"><button>delete review</button></a>
+        </div>
     </div>
-
+  </div>
 </div>
+<div class="space"></div>
+<div class="title">
+<h2 class="comment-title">Comments</h2>
 <div class="comment-section">
-    <h2 class="comment-title">Comments</h2>
+
     <ul class="commentList">
         {% for comment in comments: %}
-        <li>
-            <div class="commenterImage">
 
-            </div>
+        <li class="commentLi">
             <div class="commentText">
                 <p>{{ comment.text|safe }}</p>
-            </div>
-            <div class="avatar-image">
-                <span>{{ comment.comment_author.username }}</span>
-                <img src="{{ url_for('static', filename='img/scoob.jpeg')}}"/>
-                <a href="{{ url_for('delete_comment', id=comment.venue_id, type='venue') }}"><button>Delete</button></a>
+                <a href="{{ url_for('show_profile', username=comment.comment_author.username) }}"><p class="commenter-name">{{ comment.comment_author.username }}</p></a>
             </div>
         </li>
         {% endfor %}
     </ul>
+
+</div>
     {% if current_user.is_authenticated %}
-    {{ ckeditor.load(pkg_type="basic") }}
-    {{ ckeditor.load() }}
-    {{ ckeditor.config(name='body') }}
-    {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+        <form action="{{ url_for('view_venue_review', id=post.id) }}" method="post">
+            <label>Comment</label>
+            <textarea id="venue-review" type="text" placeholder="say it dont spray it" style="width: 500px; height:200px" name="comment"></textarea>
+            <button>share</button>
+        </form>
+
     {% endif %}
 </div>
-</div>
+
 {% include "footer.html" %}
