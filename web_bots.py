@@ -153,38 +153,6 @@ class RiotRoomScraper:
 
 
 
-        # all_shows = self.driver.find_elements_by_css_selector('')
-        #
-        #
-        #
-        #
-        # print(all_shows)
-        # for show in all_shows[:11]:
-        #     print(show)
-        #     individual_show = {}
-        #     price = show.find_element_by_class_name('w-price').text
-        #     title = show.find_element('h2').text
-        #     individual_show['price'] = price
-        #     individual_show['title'] = title
-        #     print(individual_show)
-
-
-    ##### Beautiful Soup #######
-    # def get_shows(self):
-    #     response = requests.get('https://www.therecordbar.com/tickets')
-    #     html = response.content
-    #     soup = BeautifulSoup(html, 'html.parser')
-    #     with open("output.html", "w", encoding = 'utf-8') as file:
-    #
-    # # prettify the soup object and convert it into a string
-    #         file.write(str(soup.prettify()))
-    #
-    #     print(html)
-    #     # with open('record_bar_site.html', 'w') as site:
-    #     #     site.write(html)
-
-
-
 
 
 

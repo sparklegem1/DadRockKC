@@ -27,28 +27,7 @@ pic = urllib.request.urlretrieve(url, f"static/img/hello-profile-pic.png")
 im = Image.open(pic[0])
 fn, ext = os.path.splitext(pic[0])
 print(fn, ext)
-# im.save(f'static/img/{fn}.png')
+
 crop = ImageCropper()
 crop.crop_image('static/img', 'cropped-imgs')
 print(os.listdir('static/img'))
-# crop = ImageCropper()
-# crop.crop_image('static/img', 'cropped-imgs')
-# im_dim =  (756, 960)
-
-# width, height = im.size
-# print(im.size)
-#
-# xcenter = im.size / 2
-# # Setting the points for cropped image
-# x1 = xcenter - 100
-# y1 =
-# x2 = xcenter + 100
-# y2 = 800
-#
-# # Cropped image of above dimension
-# # (It will not change original image)
-# im1 = im.crop((x1, y1, x2, y2))
-# newsize = (152, 152)
-# im1 = im1.resize(newsize)
-# # Shows the image in image viewer
-# im1.show()
