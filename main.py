@@ -185,12 +185,7 @@ class ShowComment(db.Model):
 
 db.create_all()
 
-# class Gig(db.Model):
-#     __tablename__ = 'gig'
-#     id = db.Column(db.Integer, primary_key=True)
-#     date = db.Column(db.String(15), nullable=False)
-#     artist_names =db.Column(db.String(100), nullable=False)
-#     genre = db.Column(db.String(100), nullable=False)
+
 
 
 ####################################### REST API #########################################
@@ -293,8 +288,7 @@ def create_account_html():
         # CROPPING IMAGE AND SAVING TO FILESYSTEM
         pic = urllib.request.urlretrieve(url, f"static/img/{username}-profile-pic.png")
         try:
-            im = Image.open(pic[0])
-            im.show()
+            # im = Image.open(pic[0])
             fn, ext = os.path.splitext(pic[0])
             print(fn, ext)
             # im.save(f'static/img/{fn}.png')
@@ -336,8 +330,8 @@ def add_venue():
             )
             db.session.add(new_venue)
             db.session.commit()
-            data = {'venue-name': request.form['venue-name'], 'city': request.form['city']}
-            return jsonify(new_venue.to_dict())
+
+            return redirect(url_for('all_venue_reviews_html'))
     return render_template('add-venue.html')
 
 # POST VENUE REVIEW
@@ -349,7 +343,7 @@ def post_venue_review():
                 review_title=request.form['review-title'],
                 venue_name=request.form['venue-name'],
                 review=request.form['review'],
-                user_id=1,
+                user_id=current_user.id,
                 venue_id=Venue.query.filter_by(venue_name=request.form['venue-name']).first().id
             )
             db.session.add(new_review)
@@ -370,7 +364,9 @@ def view_venue_review(id):
     requested_venue = VenueReview.query.get(id)
     all_comments = requested_venue.comments
     if request.method == 'POST':
-
+        if request.form['comment'] == '':
+            flash('you cant leave this blank')
+            return redirect(url_for('view_venue_review', id=id))
         new_comment = VenueComment(
             text=request.form['comment'],
             user_id=current_user.id,
@@ -459,7 +455,9 @@ def view_show_review(review_id):
     requested_review = ShowReview.query.get(review_id)
     all_comments = requested_review.comments
     if request.method == 'POST':
-
+        if request.form['comment']:
+            flash('cant leave blank')
+            return redirect(url_for('view_show_review', review_id=review_id))
         new_comment = ShowComment(
             text=request.form['comment'],
             user_id=current_user.id,
@@ -689,18 +687,6 @@ def request_bot():
     return render_template('request-bot.html')
 
 
-
-# @app.route('/add-gig', methods=['GET', 'POST'])
-# def add_gig():
-#     if request.method == 'POST':
-#         new_gig = Gig(
-#             date=request.form['date'],
-#             title=request.form['title'],
-#             genre=request.form['genre'],
-#             artist_names=request.form['artists']
-#         )
-#     return render_template('add-gig.html')
-#
 
 
 
