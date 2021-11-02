@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 from web_bots import *
 from flask_sqlalchemy import SQLAlchemy
 from flask_ckeditor import CKEditor
-#from flask import abort
+
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
 from forms import CommentForm, LoginForm, EditProfile, EditDescription
 from datetime import datetime
