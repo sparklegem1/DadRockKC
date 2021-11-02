@@ -2,17 +2,17 @@ from functools import wraps
 import urllib.request
 from flask import Flask, render_template, redirect, url_for, flash, request, jsonify
 from flask_bootstrap import Bootstrap
-from sqlalchemy import column
+
 from sqlalchemy.orm import relationship
 from werkzeug.exceptions import abort
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
+
 from web_bots import *
 from flask_sqlalchemy import SQLAlchemy
 from flask_ckeditor import CKEditor
 
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
-from forms import CommentForm, LoginForm, EditProfile, EditDescription
+from forms import LoginForm, EditProfile, EditDescription
 from datetime import datetime
 from image_handler import ImageCropper
 import os
