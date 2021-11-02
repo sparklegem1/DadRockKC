@@ -15,7 +15,6 @@ from flask_login import UserMixin, login_user, LoginManager, current_user, logou
 from forms import CommentForm, LoginForm, EditProfile, EditDescription
 from datetime import datetime
 from image_handler import ImageCropper
-
 import os
 from PIL import Image, UnidentifiedImageError
 
@@ -263,9 +262,7 @@ def create_user_account(username, password, email):
         )
         db.session.add(new_user)
         db.session.commit()
-        return jsonify({'message': f'Welcome {form["username"]}! Tis a pleasure to have you aboard! You may now post reviews and comments. ',
-                        'username': form['username'],
-                        'email': form['email']})
+        return jsonify(new_user.to_dict())
 
     return jsonify({'message': 'create-account'})
 
@@ -710,13 +707,14 @@ def request_bot():
 //TODO: view individual reviews
 //TODO: add profile button to navbar
 TODO: Catch all errors in forms
+TODO: make sure each page is responisive
 //TODO: make profile pages available by clicking username
 //TODO: Update all venue reviews page
 //TODO: Add profile pictures to users
 //TODO: Add profile viewing page where you can edit features of your profile 
 //TODO: Make edit functionality to edit button on profile page
 //TODO: install iterm 
-TODO: push all items to github
+//TODO: push all items to github
 TODO: host site on heroku / switch to postgre
 
  
