@@ -1,3 +1,4 @@
+import binascii
 from functools import wraps
 import urllib.request
 from flask import Flask, render_template, redirect, url_for, flash, request, jsonify
@@ -18,27 +19,19 @@ from image_handler import ImageCropper
 import os
 from PIL import Image, UnidentifiedImageError
 
-############################### API DESCRIPTION ###################################
-# Get all information about local shows from one site with the local gig api
-# Employing web scraping to get show information from local sites to provide
-# up to date info on local shows
-
-
 
 app = Flask(__name__)
 
 
-#db
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dadrockkc4.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'huffingpaint60'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 ckeditor = CKEditor(app)
 Bootstrap(app)
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-YOUTUBE_URL = "https://www.youtube.com/channel/UCihF4V5Y1pZUuKQha4vtsIA/videos"
 
 
 # Table for all venues
@@ -99,9 +92,8 @@ class ShowReview(db.Model):
     venue = db.Column(db.String(20), nullable=False)
     date = db.Column(db.String(250), nullable=False)
     genre = db.Column(db.String(15), nullable=False)
-    price = db.Column(db.Float(20), nullable=False)
+    price = db.Column(db.String(20), nullable=False)
     rating = db.Column(db.String(10), nullable=False)
-    # CHANGE REVIEW LENGTH TO ONLY 200
     review = db.Column(db.String(200), nullable=False)
 
     #User relationship
@@ -168,7 +160,7 @@ db.create_all()
 class ShowComment(db.Model):
     __tablename__ = 'show_comment'
     id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.String(250))
+    text = db.Column(db.String(250), nullable=False)
 
     #user relationship
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -187,7 +179,7 @@ db.create_all()
 
 
 
-####################################### REST API #########################################
+####################################### WEB APP #########################################
 
 
 # ADMIN ONLY
@@ -283,7 +275,11 @@ def create_account_html():
         hash = generate_password_hash(to_hash, method='pbkdf2:sha256', salt_length=8)
 
         # CROPPING IMAGE AND SAVING TO FILESYSTEM
-        pic = urllib.request.urlretrieve(url, f"static/img/{username}-profile-pic.png")
+
+        try:
+            pic = urllib.request.urlretrieve(url, f"static/img/{username}-profile-pic.png")
+        except binascii.Error:
+            return jsonify({'message': 'cannot make image out of this url, try a different one'})
         try:
             # im = Image.open(pic[0])
             fn, ext = os.path.splitext(pic[0])
@@ -429,6 +425,11 @@ def show_review():
         rating = request.form['rating']
         review = request.form['review']
         genre = request.form['genre']
+        form_data = [title, artist_names, venue_name, date, price, rating, review, genre]
+        for d in form_data:
+            if d == '':
+                flash('cant leave these fields blank')
+                return redirect(url_for('show_review'))
         show_review = ShowReview(
             title=title,
             artist_names=artist_names,
@@ -452,7 +453,7 @@ def view_show_review(review_id):
     requested_review = ShowReview.query.get(review_id)
     all_comments = requested_review.comments
     if request.method == 'POST':
-        if request.form['comment']:
+        if request.form['comment'] == '':
             flash('cant leave blank')
             return redirect(url_for('view_show_review', review_id=review_id))
         new_comment = ShowComment(
@@ -467,8 +468,7 @@ def view_show_review(review_id):
     return render_template("show-review.html",
                            post=requested_review,
                            comments=all_comments,
-                           current_user=current_user,
-                           year=datetime.now().year)
+                           current_user=current_user,)
 
 
 # SHOW REVIEW JSON
@@ -477,12 +477,12 @@ def show_review_json(review_id):
     review = ShowReview.query.get(review_id)
     if review:
         review_data = {'title': review.title,
-                    'artist_names': review.artist_names,
-                    'venue': review.venue.venue_name,
-                    'date': review.date,
-                    'price': review.price,
-                    'rating': review.rating,
-                    'review': review.review}
+                       'artist_names': review.artist_names,
+                       'venue': review.venue.venue_name,
+                       'date': review.date,
+                       'price': review.price,
+                       'rating': review.rating,
+                       'review': review.review}
         if review.user:
             review_data['user'] = review.user.username
     else:
@@ -619,17 +619,24 @@ def edit_profile():
     )
     if form.validate_on_submit():
         if user.username != form.username.data:
+            if User.query.filter_by(username=form.username.data):
+                flash('there is a user that already exists with this name')
+                return redirect(url_for('edit_profile'))
             user.username=form.username.data
         if form.img_url.data != 'new image url':
-            pic = urllib.request.urlretrieve(form.img_url.data, f"static/img/{user.username}-profile-pic.png")
+            try:
+                pic = urllib.request.urlretrieve(form.img_url.data, f"static/img/{user.username}-profile-pic.png")
+            except binascii.Error:
+                flash('cannot use this image url, try another one')
+                return redirect(url_for('edit_profile'))
             try:
                 im = Image.open(pic[0])
-                im.show()
                 crop = ImageCropper()
                 crop.crop_image('static/img', 'cropped-imgs')
                 print(os.listdir('static/img'))
             except UnidentifiedImageError:
-                return jsonify({'message': 'sorry, cant make an image out of this url!'})
+                flash('cannot use this image url, try another one')
+                return redirect(url_for('edit_profile'))
 
             for image in os.listdir('static/cropped-imgs'):
                 if f'{user.username}-profile-pic.png' == image:
@@ -669,6 +676,9 @@ def edit_show_review(id):
 def edit_venue_review(id):
     review = VenueReview.query.get(id)
     if request.method == 'POST':
+        if request.form['review'] == '':
+            flash('cant be blank')
+            return redirect(url_for('edit_venue_review', id=id))
         review.review = request.form['review']
         db.session.commit()
         return redirect(url_for('all_venue_reviews_html'))
@@ -707,7 +717,7 @@ def request_bot():
 //TODO: view individual reviews
 //TODO: add profile button to navbar
 TODO: Catch all errors in forms
-TODO: make sure each page is responisive
+TODO: make sure each page is responsive
 //TODO: make profile pages available by clicking username
 //TODO: Update all venue reviews page
 //TODO: Add profile pictures to users
@@ -722,10 +732,7 @@ TODO: host site on heroku / switch to postgre
 
 
 
-⌘ means Command
-⌥ means Option (also called “Alt”)
-⌃ means Control
-⇧ means Shift
+
 
 """
 

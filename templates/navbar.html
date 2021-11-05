@@ -2,7 +2,6 @@
 
 
 <ul class="navlist">
-
     {% if not current_user.is_authenticated: %}
     <li><a href="{{ url_for('create_account_html') }}">Create Account</a></li>
     {% endif %}
@@ -13,26 +12,10 @@
     {% endif %}
     {% if not current_user.is_authenticated %}
       <li><a href="{{ url_for('login') }}">Login</a></li>
-
     {% endif %}
     <li><a href="{{ url_for('home') }} ">Home</a></li>
 </ul>
 <button class="habmurger" id="hamburger">
         <i class="fas fa-bars"></i>
 </button>
-
-
-
-<!--{% include "site.html" %}-->
-<!--<div class="nav-container">-->
-<!--  <nav>-->
-<!--    <ul>-->
-<!--      <li><a href="">Home</a></li>-->
-<!--      <li><a href="">Login</a></li>-->
-<!--      <li><a href="">Logout</a></li>-->
-<!--      <li><a href="">About</a></li>-->
-<!--      <li><a href="">Contact</a></li>-->
-<!--    </ul>-->
-<!--  </nav>-->
-<!--</div>-->
 

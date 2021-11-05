@@ -55,7 +55,7 @@
 
 </div>
     {% if current_user.is_authenticated %}
-        <form action="{{ url_for('view_venue_review', id=post.id) }}" method="post">
+        <form class="comment-form" action="{{ url_for('view_venue_review', id=post.id) }}" method="post">
             <label>Comment</label>
             <textarea id="venue-review" type="text" placeholder="say it dont spray it" style="width: 500px; height:200px" name="comment"></textarea>
             <button>share</button>
@@ -63,5 +63,13 @@
 
     {% endif %}
 </div>
+<script>
+    const hamburger = document.querySelector('#hamburger');
+    const navUL = document.querySelector('.navlist');
 
+    hamburger.addEventListener('click', () => {
+        console.log('hi');
+        navUL.classList.toggle('show');
+});
+</script>
 {% include "footer.html" %}

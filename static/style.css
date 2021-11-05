@@ -15,10 +15,12 @@ body {
 }
 
 #title {
-    color: #FCFF91;
-    font-family: 'Urbanist', sans-serif;
+    color: #a2d173;
+    font-family: 'Qahiri', sans-serif;
+    margin-top: 250px;
+    margin-bottom: 200px;
     font-weight: 700;
-    font-size: 45px;
+    font-size: 300px;
     text-align: center;
 
 }
@@ -228,7 +230,6 @@ button::hover {
     border: 0px;
     display: none;
     cursor: pointer;
-
 }
 
 #hamburger::hover {
@@ -328,6 +329,7 @@ ul {
     font-size: 27px;
     font-family: 'Urbanist', sans-serif;
 }
+
 .comment-a {
     color: #8FD1A2;
     font-size: 20px;
@@ -373,9 +375,13 @@ li a:hover {
     float: left;
     display: flex;
     flex-direction: column;
+    padding-left: 5px;
+    padding-top: 10px;
 }
 
-
+.commenter-a {
+    padding: 0px;
+}
 
 .commentText p {
     width: 100%;
@@ -388,6 +394,10 @@ li a:hover {
     color: #8FD1A2;
     font-size: 20px;
 
+}
+
+.commenter-name:hover {
+    color: #FCFF91;
 }
 
 
@@ -442,9 +452,33 @@ li a:hover {
         padding: 35px;
     }
 
+    .comment-section {
+        width: 100%;
+        margin: 0px;
+    }
+
     .form-control {
         width: 100%;
 
+    }
+    .card {
+        width: 100%
+    }
+    .back {
+        width: 100%;
+        margin: 0px;
+    }
+
+    .comment-form {
+        margin: 0px;
+        width: 100%;
+        padding: 0px;
+    }
+
+    .container {
+        width: 100%;
+        margin: 0px;
+        padding-right: 0px;
     }
 
     button {

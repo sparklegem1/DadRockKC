@@ -9,21 +9,17 @@
 
 
     <div class="title">
-    <div class="dashboard">
+        <div class="dashboard">
+            <a class="dash-item" href="{{ url_for('all_venue_reviews_html') }}"><h2>All Venue Reviews</h2></a>
+            <a class="dash-item" href="{{ url_for('all_show_reviews_html') }} "><h2>All Show Reviews</h2></a>
+        </div>
+        <div class="dashboard">
 
-        <a class="dash-item" href="{{ url_for('all_venue_reviews_html') }}"><h2>All Venue Reviews</h2></a>
-        <a class="dash-item" href="{{ url_for('all_show_reviews_html') }} "><h2>All Show Reviews</h2></a>
+            <a class="dash-item" href="{{ url_for('add_venue') }}"><h2>Add a new Venue!</h2></a>
+            <a class="dash-item" href="{{ url_for('request_bot') }} "><h2>Request a web bot!</h2></a>
 
+        </div>
     </div>
 
-
-    <div class="dashboard">
-
-        <a class="dash-item" href="{{ url_for('add_venue') }}"><h2>Add a new Venue!</h2></a>
-        <a class="dash-item" href="{{ url_for('request_bot') }} "><h2>Request a web bot!</h2></a>
-
-    </div>
-    </div>
-    <a href="https://www.youtube.com/channel/UCihF4V5Y1pZUuKQha4vtsIA/videos"><img class="gnomes"  src="{{ url_for('static', filename='img/gnomes.JPG')}}"/></a>
 {% endblock %}
 {% include "footer.html" %}

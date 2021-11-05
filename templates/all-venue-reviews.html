@@ -57,10 +57,12 @@
     </div>
   </div>
 </div>
-<div class="container text-center add">
-<a href="{{ url_for('post_venue_review') }}" class="add-review-button">Add Review</a>
-</div>
+
+
 <div class="space"></div>
 {% endfor %}
 {% endblock %}
+<button class="add-review-button"><a href="{{ url_for('post_venue_review') }}">
+    Add Review</a>
+</button>
 {% include "footer.html" %}

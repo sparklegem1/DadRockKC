@@ -97,15 +97,31 @@ p {
 
 }
 
-/*.back:before,
-.back:after {
-    content : "";
-    display : table;
+.navlist {
+    padding-bottom: 20px;
+    list-style-type: None;
+    margin: 0px;
+    margin-bottom: 69px;
+    background-color: #0F5D66;
+    font-size: 27px;
+    font-family: 'Urbanist', sans-serif;
 }
-.back:after {
-    clear : both;
 
-}*/
+.nav-container {
+    background-color: white;
+    text-align: center;
+    position: fixed;
+    margin: 50px;
+}
+
+nav {
+    position: fixed;
+    color: white;
+    margin: 50px;
+    text-align: left;
+    top: 100%;
+    left: 0%;
+}
 
 .title {
     margin-top: 0px;
@@ -187,6 +203,22 @@ a {
 }
 
 @media screen and (max-width: 767px) {
+    .navlist {
+        display: none;
+        flex-direction: column;
+    }
+    .navlist.show {
+        display: flex;
+        padding-left: 0px;
+
+    }
+
+    #hamburger {
+        display: block;
+        margin-bottom: 25px;
+        maring-left: 0px;
+        width: 25%;
+    }
 
     .add-review-button {
         top: 0px;
